@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бронирование времени</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --border: #e5e7eb;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --error-bg: #fee2e2;
+    --error-text: #991b1b;
+    --busy-bg: #fef3c7;
+    --busy-text: #92400e;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+    line-height: 1.5;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 720px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-top: 6px;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    border: 1px solid var(--border);
+  }
+
+  .card + .card {
+    margin-top: 20px;
+  }
+
+  .card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  select,
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px;
+    padding-right: 40px;
+  }
+
+  select:focus,
+  input[type="text"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  }
+
+  select:disabled {
+    background-color: #f9fafb;
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+
+  button {
+    width: 100%;
+    padding: 13px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    background: var(--primary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+
+  button:active:not(:disabled) {
+    transform: scale(0.99);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .notification {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: none;
+  }
+
+  .notification.show {
+    display: block;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .notification.success {
+    background: var(--success-bg);
+    color: var(--success-text);
+  }
+
+  .notification.error {
+    background: var(--error-bg);
+    color: var(--error-text);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  .bookings-table th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bookings-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .bookings-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .time-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #eef2ff;
+    color: var(--primary);
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  .loading {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 12px 0;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.4rem; }
+    .card { padding: 18px; }
+    .bookings-table th,
+    .bookings-table td { padding: 8px 6px; font-size: 0.875rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Бронирование времени</h1>
+    <p>Выберите свободный слот и укажите имя сотрудника</p>
+  </header>
+
+  <div class="card">
+    <h2>Новая бронь</h2>
+    <form id="bookingForm">
+      <div class="form-group">
+        <label for="timeSelect">Время</label>
+        <select id="timeSelect" required>
+          <option value="">Загрузка…</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="employeeInput">Имя сотрудника</label>
+        <input type="text" id="employeeInput" placeholder="Например, Иван Иванов" required autocomplete="name">
+      </div>
+      <button type="submit" id="submitBtn">Забронировать</button>
+      <div class="notification" id="notification"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Текущие брони</h2>
+    <div id="bookingsContainer">
+      <div class="loading">Загрузка данных…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const API_URL = "https://script.google.com/macros/s/AKfycbxeKfh8EiHN1fdvVTncJZS3FD2NszI3SmV8cD70k9zd-4F99qEWuyps1upHP0FCiw/exec";
+
+  const form = document.getElementById("bookingForm");
+  const timeSelect = document.getElementById("timeSelect");
+  const employeeInput = document.getElementById("employeeInput");
+  const submitBtn = document.getElementById("submitBtn");
+  const notification = document.getElementById("notification");
+  const bookingsContainer = document.getElementById("bookingsContainer");
+
+  // Генерируем список времени от 10:00 до 22:00
+  const ALL_TIMES = [];
+  for (let h = 10; h <= 22; h++) {
+    ALL_TIMES.push(String(h).padStart(2, "0") + ":00");
+  }
+
+  let bookings = {}; // { "10:00": "Имя", ... }
+
+  function showNotification(message, type) {
+    notification.textContent = message;
+    notification.className = "notification show " + type;
+    setTimeout(() => {
+      notification.classList.remove("show");
+    }, 4000);
+  }
+
+  function renderTimeOptions() {
+    timeSelect.innerHTML = "";
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    placeholder.textContent = "Выберите время";
+    timeSelect.appendChild(placeholder);
+
+    ALL_TIMES.forEach((time) => {
+      const opt = document.createElement("option");
+      opt.value = time;
+      if (bookings[time]) {
+        opt.disabled = true;
+        opt.textContent = time + " — Занято (" + bookings[time] + ")";
+      } else {
+        opt.textContent = time;
+      }
+      timeSelect.appendChild(opt);
+    });
+  }
+
+  function renderBookingsTable() {
+    const entries = Object.keys(bookings).sort();
+    if (entries.length === 0) {
+      bookingsContainer.innerHTML = '<div class="empty">Пока нет броней</div>';
+      return;
+    }
+
+    const table = document.createElement("table");
+    table.className = "bookings-table";
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = "<tr><th>Время</th><th>Сотрудник</th></tr>";
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    entries.forEach((time) => {
+      const tr = document.createElement("tr");
+      const tdTime = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "time-badge";
+      badge.textContent = time;
+      tdTime.appendChild(badge);
+
+      const tdName = document.createElement("td");
+      tdName.textContent = bookings[time];
+
+      tr.appendChild(tdTime);
+      tr.appendChild(tdName);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    bookingsContainer.innerHTML = "";
+    bookingsContainer.appendChild(table);
+  }
+
+  function renderAll() {
+    renderTimeOptions();
+    renderBookingsTable();
+  }
+
+  async function loadBookings() {
+    bookingsContainer.innerHTML = '<div class="loading">Загрузка данных…</div>';
+    timeSelect.innerHTML = '<option value="">Загрузка…</option>';
+
+    try {
+      const res = await fetch(API_URL, { method: "GET" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      // Ожидаем либо объект вида { "10:00": "Имя" }, либо массив [{time, employee}]
+      bookings = {};
+      if (Array.isArray(data)) {
+        data.forEach((item) => {
+          if (item && item.time) bookings[item.time] = item.employee || "";
+        });
+      } else if (data && typeof data === "object") {
+        // Поддерживаем варианты: {bookings: {...}} или плоский объект
+        const src = data.bookings && typeof data.bookings === "object" ? data.bookings : data;
+        Object.keys(src).forEach((key) => {
+          const val = src[key];
+          if (typeof val === "string") {
+            bookings[key] = val;
+          } else if (val && typeof val === "object" && val.employee) {
+            bookings[key] = val.employee;
+          }
+        });
+      }
+      renderAll();
+    } catch (err) {
+      console.error(err);
+      bookingsContainer.innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
+      renderTimeOptions();
+      showNotification("Не удалось загрузить список броней", "error");
+    }
+  }
+
+  async function submitBooking(time, employee) {
+    // Google Apps Script корректно принимает POST с text/plain (без preflight)
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ time: time, employee: employee })
+    });
+
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    return data;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const time = timeSelect.value;
+    const employee = employeeInput.value.trim();
+
+    if (!time) {
+      showNotification("Пожалуйста, выберите время", "error");
+      return;
+    }
+    if (!employee) {
+      showNotification("Пожалуйста, укажите имя сотрудника", "error");
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Отправка…";
+
+    try {
+      const data = await submitBooking(time, employee);
+
+      if (data && data.success === false) {
+        showNotification(data.message || "Это время уже занято", "error");
+      } else {
+        showNotification(data && data.message ? data.message : "Бронь успешно создана!", "success");
+        employeeInput.value = "";
+      }
+
+      await loadBookings();
+    } catch (err) {
+      console.error(err);
+      showNotification("Ошибка при отправке. Попробуйте позже.", "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Забронировать";
+    }
+  });
+
+  // Инициализация
+  loadBookings();
+})();
+</script>
+</body>
+</html>
