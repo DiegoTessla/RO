@@ -25,8 +25,6 @@
     --error-text: #fecaca;
     --busy-bg: #3f3a1a;
     --busy-text: #fde68a;
-    --free-bg: #1e3a2a;
-    --free-text: #86efac;
   }
 
   html, body { height: 100%; }
@@ -142,7 +140,7 @@
     color: var(--muted);
   }
 
-  select, input[type="text"], input[type="password"], input[type="login"] {
+  select, input[type="text"], input[type="password"] {
     width: 100%;
     padding: 12px 14px;
     font-size: 0.98rem;
@@ -299,6 +297,7 @@
     .card { padding: 16px; border-radius: 14px; }
     .bookings-table th, .bookings-table td { padding: 8px 6px; font-size: 0.85rem; }
     .btn-danger { padding: 5px 9px; font-size: 0.75rem; }
+    .btn-ghost { padding: 4px 8px !important; font-size: 0.72rem !important; }
   }
 </style>
 </head>
@@ -325,7 +324,7 @@
 
     <p class="auth-switch">
       Нет аккаунта?
-      <button type="button" id="switchToRegister">Зарегистрироваться</button>
+      <button type="button" id="switchToRegister">Обратитесь к администратору</button>
     </p>
   </div>
 </div>
@@ -413,13 +412,33 @@
   const HOURS_START = 10;
   const HOURS_END = 22;
 
+  const USER_BOOKING_LIMIT = 2;       // лимит для роли 'user'
+  const AUTO_REFRESH_MS = 30000;      // автообновление раз в 30 секунд
+
+  // Тексты для кнопки "Копировать" по каждому часу
+  const HOUR_MESSAGES = {
+    "10:00": "Доброе утро. Не забывайте включить бодикамеру. Скриншоты без включенной бодикамеры в отчетность не принимаются.",
+    "11:00": "Дежурство в больницах также является важной частью нашей работы, пожалуйста распределитесь по больницам.",
+    "12:00": "По всем интересующим вас вопросам вы можете обратиться к инструкторам или заместителям отдела в личные сообщения спецсвязи.",
+    "13:00": "Пожалуйста, проверяйте свои укладки на количество и комплектность медикаментов. В случае если у вас не оказалось эпинефрина на месте вызова - вызовите 103 с телефона и дождитесь сотрудника больницы.",
+    "14:00": "Настало время обеденного перерыва. Напоминаю, что работа в обеденный перерыв с 14:00 до 15:00 учитывается в двойном размере по системе баллов.",
+    "15:00": "Обед завершен. Продолжаем работу. Не забывайте парковать АСМП в отведенных для этого местах.",
+    "16:00": "Будьте осторожны на ПМП. При угрозе жизни или при перестрелке на месте происшествия немедленно уезжаем.",
+    "17:00": "По прибытию на ПМП в первую очередь оказываем медицинскую помощь государственным служащим силовых структур на месте происшествия.",
+    "18:00": "Не забывайте включать бодикамеры, находясь на рабочем месте. Скриншоты с выключенной бодикамерой в отчетность не принимаются.",
+    "19:00": "По приезду на место вызова, где осуществляется перекрытие военной поставки и при наличии активной перестрелки категорически запрещено оказывать ПМП, в случае окончания перестрелки в первую очередь необходимо оказывать помощь исключительно государственным служащим.",
+    "20:00": "Напоминаю, для сотрудников 7 ранга и выше введена активность - практика для сотрудников с должностью \"Санитар\", в рацию будут поступать запросы, вы на них реагируете, встречаетесь и вместе едете на ПМП, параллельно отвечаете на вопросы. Подробная информация имеется в спецсвязи.",
+    "21:00": "Дежурство в больницах также является важной частью нашей работы, пожалуйста распределитесь по больницам.",
+    "22:00": "Дневная смена завершена. Напоминаю, что в ночную смену вы получаете увеличенное количество баллов за ПМП. Ночная смена не является обязательной."
+  };
+
   /* ============================================================
    *  СОСТОЯНИЕ
    * ============================================================ */
   const state = {
-    user: null,          // { login, role, hash }
-    bookings: [],        // [{ rowIndex, time, employee }]
-    authMode: "login"    // 'login' | 'register'
+    user: null,
+    bookings: [],
+    authMode: "login"
   };
 
   /* ============================================================
@@ -482,13 +501,6 @@
   /* ============================================================
    *  СЕТЬ
    * ============================================================ */
-  async function apiGet(params) {
-    const url = API_URL + "?" + new URLSearchParams(params).toString();
-    const res = await fetch(url, { method: "GET" });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
-  }
-
   async function apiPost(payload) {
     const res = await fetch(API_URL, {
       method: "POST",
@@ -542,7 +554,6 @@
       switchTab("booking");
     }
 
-    // Поле имени блокируем для обычных пользователей
     if (state.user.role === "user") {
       employeeInput.value = state.user.login;
       employeeInput.disabled = true;
@@ -567,14 +578,6 @@
 
     try {
       const hash = await sha256Hex(password);
-
-      if (state.authMode === "register") {
-        // Самостоятельная регистрация не предусмотрена — только через админа.
-        // Поэтому переключаем на вход и сообщаем.
-        notify(authNotification, "Регистрация доступна только через администратора", "error");
-        return;
-      }
-
       const data = await apiPost({ action: "login", login: login, hash: hash });
 
       if (!data.success) {
@@ -594,20 +597,6 @@
     }
   }
 
-  function setAuthMode(mode) {
-    state.authMode = mode;
-    if (mode === "login") {
-      authTitle.textContent = "Вход";
-      authSubtitle.textContent = "Войдите, чтобы забронировать время";
-      authSubmit.textContent = "Войти";
-      switchToRegister.parentElement.innerHTML =
-        'Нет аккаунта? <button type="button" id="switchToRegister">Обратитесь к администратору</button>';
-      document.getElementById("switchToRegister").addEventListener("click", () => {
-        notify(authNotification, "Регистрация доступна только через администратора", "error");
-      });
-    }
-  }
-
   /* ============================================================
    *  БРОНИ
    * ============================================================ */
@@ -617,6 +606,14 @@
       arr.push(String(h).padStart(2, "0") + ":00");
     }
     return arr;
+  }
+
+  function myBookingsCount() {
+    if (!state.user) return 0;
+    const me = state.user.login.toLowerCase();
+    return state.bookings.filter(
+      (b) => String(b.employee).trim().toLowerCase() === me
+    ).length;
   }
 
   function renderTimeOptions() {
@@ -644,6 +641,34 @@
     });
   }
 
+  async function copyHourMessage(time) {
+    const base = HOUR_MESSAGES[time] || "";
+    if (!base) {
+      notify(bookingNotification, "Для этого времени нет текста", "error");
+      return;
+    }
+    const text = "/fb " + base;
+    try {
+      await navigator.clipboard.writeText(text);
+      notify(bookingNotification, "Текст для " + time + " скопирован", "success");
+    } catch (err) {
+      // Фолбэк для старых браузеров / HTTP
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        notify(bookingNotification, "Текст для " + time + " скопирован", "success");
+      } catch (e) {
+        notify(bookingNotification, "Не удалось скопировать текст", "error");
+      }
+      document.body.removeChild(ta);
+    }
+  }
+
   function renderBookingsTable() {
     if (!state.bookings.length) {
       bookingsContainer.innerHTML = '<div class="empty">Пока нет броней</div>';
@@ -656,9 +681,7 @@
     table.className = "bookings-table";
 
     const thead = document.createElement("thead");
-    thead.innerHTML = isAdmin
-      ? "<tr><th>Время</th><th>Сотрудник</th><th></th></tr>"
-      : "<tr><th>Время</th><th>Сотрудник</th></tr>";
+    thead.innerHTML = "<tr><th>Время</th><th>Сотрудник</th><th></th></tr>";
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
@@ -677,20 +700,32 @@
         const tdName = document.createElement("td");
         tdName.textContent = b.employee;
 
-        tr.appendChild(tdTime);
-        tr.appendChild(tdName);
+        const tdActions = document.createElement("td");
+        tdActions.style.textAlign = "right";
+        tdActions.style.whiteSpace = "nowrap";
 
+        // Кнопка "Копировать" — для всех
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "btn btn-ghost";
+        copyBtn.style.padding = "5px 10px";
+        copyBtn.style.fontSize = "0.78rem";
+        if (isAdmin) copyBtn.style.marginRight = "6px";
+        copyBtn.textContent = "Копировать";
+        copyBtn.addEventListener("click", () => copyHourMessage(b.time));
+        tdActions.appendChild(copyBtn);
+
+        // Кнопка "Удалить" — только админ
         if (isAdmin) {
-          const tdActions = document.createElement("td");
-          tdActions.style.textAlign = "right";
-          const btn = document.createElement("button");
-          btn.className = "btn btn-danger";
-          btn.textContent = "Удалить";
-          btn.addEventListener("click", () => deleteReservation(b.rowIndex));
-          tdActions.appendChild(btn);
-          tr.appendChild(tdActions);
+          const delBtn = document.createElement("button");
+          delBtn.className = "btn btn-danger";
+          delBtn.textContent = "Удалить";
+          delBtn.addEventListener("click", () => deleteReservation(b.rowIndex));
+          tdActions.appendChild(delBtn);
         }
 
+        tr.appendChild(tdTime);
+        tr.appendChild(tdName);
+        tr.appendChild(tdActions);
         tbody.appendChild(tr);
       });
     table.appendChild(tbody);
@@ -702,26 +737,57 @@
   function renderBookings() {
     renderTimeOptions();
     renderBookingsTable();
+
+    // Лимит брони для обычного пользователя
+    if (state.user && state.user.role === "user") {
+      const count = myBookingsCount();
+      if (count >= USER_BOOKING_LIMIT) {
+        bookBtn.disabled = true;
+        bookBtn.textContent = "Лимит: " + USER_BOOKING_LIMIT + " брони";
+      } else {
+        bookBtn.disabled = false;
+        bookBtn.textContent = "Забронировать";
+      }
+    } else {
+      bookBtn.disabled = false;
+      bookBtn.textContent = "Забронировать";
+    }
   }
 
   async function loadBookings() {
-    bookingsContainer.innerHTML = '<div class="loading">Загрузка данных…</div>';
-    timeSelect.innerHTML = '<option value="">Загрузка…</option>';
+    // Не переводим интерфейс в "Загрузка…", если это фоновое обновление
+    if (!state.bookings.length) {
+      bookingsContainer.innerHTML = '<div class="loading">Загрузка данных…</div>';
+      timeSelect.innerHTML = '<option value="">Загрузка…</option>';
+    }
+
     try {
       const data = await apiPost({ action: "getReservations" });
-      if (!data.success) throw new Error(data.message || "Ошибка загрузки");
+      if (!data || !data.success) {
+        throw new Error((data && data.message) || "Сервер вернул ошибку");
+      }
       state.bookings = data.reservations || [];
       renderBookings();
     } catch (err) {
-      console.error(err);
-      bookingsContainer.innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
-      notify(bookingNotification, "Не удалось загрузить список броней", "error");
+      console.error("loadBookings error:", err);
+      bookingsContainer.innerHTML =
+        '<div class="empty">Не удалось загрузить данные: ' +
+        String(err.message || err) + '</div>';
+      state.bookings = [];
+      renderBookings();
+      notify(bookingNotification, "Не удалось загрузить брони: " + (err.message || err), "error");
     }
   }
 
   async function addReservation(e) {
     e.preventDefault();
     if (!state.user) return;
+
+    // Локальная проверка лимита
+    if (state.user.role === "user" && myBookingsCount() >= USER_BOOKING_LIMIT) {
+      notify(bookingNotification, "Достигнут лимит: не более " + USER_BOOKING_LIMIT + " броней на пользователя", "error");
+      return;
+    }
 
     const time = timeSelect.value;
     const employee = employeeInput.value.trim();
@@ -819,11 +885,6 @@
         newRole: role
       });
 
-      // ВАЖНО: в скрипте мы ожидаем поля login/hash текущего админа
-      // и newLogin/newHash/newRole для нового пользователя.
-      // Ниже — корректный payload с учётом скрипта.
-      // (см. пояснение после кода)
-
       if (!data.success) {
         notify(registerNotification, data.message || "Ошибка регистрации", "error");
       } else {
@@ -854,29 +915,17 @@
    *  ИНИЦИАЛИЗАЦИЯ
    * ============================================================ */
   function init() {
-    // Авторизация
     authForm.addEventListener("submit", handleAuthSubmit);
-    if (switchToRegister) {
-      switchToRegister.addEventListener("click", () => {
-        notify(authNotification, "Регистрация доступна только через администратора", "error");
-      });
-    }
 
-    // Выход
     logoutBtn.addEventListener("click", () => {
       clearSession();
       showAuth();
-      setAuthMode("login");
       authForm.reset();
     });
 
-    // Брони
     bookingForm.addEventListener("submit", addReservation);
-
-    // Регистрация пользователя
     registerForm.addEventListener("submit", handleRegisterUser);
 
-    // Вкладки
     document.querySelectorAll(".tab").forEach((tab) => {
       tab.addEventListener("click", () => switchTab(tab.dataset.tab));
     });
@@ -887,9 +936,15 @@
       state.user = session;
       showApp();
     } else {
-      setAuthMode("login");
       showAuth();
     }
+
+    // Автообновление списка броней
+    setInterval(() => {
+      if (state.user && !document.hidden) {
+        loadBookings();
+      }
+    }, AUTO_REFRESH_MS);
   }
 
   document.addEventListener("DOMContentLoaded", init);
