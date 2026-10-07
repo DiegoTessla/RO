@@ -5,100 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Бронирование времени</title>
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #f5f7fb;
-    --card: #ffffff;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --border: #e5e7eb;
-    --success-bg: #dcfce7;
-    --success-text: #166534;
-    --error-bg: #fee2e2;
-    --error-text: #991b1b;
-    --busy-bg: #fef3c7;
-    --busy-text: #92400e;
+    --bg: #0f1115;
+    --bg-soft: #161a22;
+    --card: #1c2230;
+    --card-2: #232a3a;
+    --text: #e6e9ef;
+    --muted: #8a93a6;
+    --border: #2a3243;
+    --primary: #6366f1;
+    --primary-hover: #7c7ff5;
+    --danger: #ef4444;
+    --danger-hover: #f56565;
+    --success-bg: #14532d;
+    --success-text: #bbf7d0;
+    --error-bg: #4c1d1d;
+    --error-text: #fecaca;
+    --busy-bg: #3f3a1a;
+    --busy-text: #fde68a;
+    --free-bg: #1e3a2a;
+    --free-text: #86efac;
   }
+
+  html, body { height: 100%; }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: var(--bg);
+    background: radial-gradient(circle at top, #1a2030 0%, var(--bg) 55%);
     color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 24px 16px;
     line-height: 1.5;
+    min-height: 100vh;
+    padding: 20px 14px;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .container {
-    width: 100%;
-    max-width: 720px;
-  }
+  .container { max-width: 860px; margin: 0 auto; }
 
   header {
-    text-align: center;
-    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   header h1 {
-    font-size: 1.75rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
 
-  header p {
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
     color: var(--muted);
-    font-size: 0.95rem;
-    margin-top: 6px;
   }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .badge.admin { background: #4c1d95; color: #ddd6fe; }
+  .badge.user  { background: #1e3a8a; color: #bfdbfe; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 16px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #fff;
+    background: var(--primary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s, opacity 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) { background: var(--primary-hover); }
+  .btn:active:not(:disabled) { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--card-2); }
+
+  .btn-danger {
+    background: var(--danger);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+  .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+
+  .btn-block { width: 100%; }
 
   .card {
-    background: var(--card);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    background: linear-gradient(180deg, var(--card) 0%, var(--bg-soft) 100%);
     border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
   }
-
-  .card + .card {
-    margin-top: 20px;
-  }
+  .card + .card { margin-top: 18px; }
 
   .card h2 {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
-  .form-group {
-    margin-bottom: 16px;
-  }
+  .form-group { margin-bottom: 14px; }
 
   label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.82rem;
     font-weight: 500;
     margin-bottom: 6px;
-    color: var(--text);
+    color: var(--muted);
   }
 
-  select,
-  input[type="text"] {
+  select, input[type="text"], input[type="password"], input[type="login"] {
     width: 100%;
     padding: 12px 14px;
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-family: inherit;
     color: var(--text);
-    background: #fff;
+    background: var(--card-2);
     border: 1px solid var(--border);
     border-radius: 10px;
     outline: none;
@@ -108,202 +158,471 @@
   }
 
   select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 18px;
     padding-right: 40px;
   }
 
-  select:focus,
-  input[type="text"]:focus {
+  select:focus, input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
   }
 
-  select:disabled {
-    background-color: #f9fafb;
+  select:disabled, input:disabled {
+    background: #11141b;
     color: var(--muted);
     cursor: not-allowed;
   }
 
-  button {
-    width: 100%;
-    padding: 13px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: inherit;
-    color: #fff;
-    background: var(--primary);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.05s;
-  }
-
-  button:hover:not(:disabled) {
-    background: var(--primary-hover);
-  }
-
-  button:active:not(:disabled) {
-    transform: scale(0.99);
-  }
-
-  button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
   .notification {
-    margin-top: 16px;
-    padding: 12px 16px;
+    margin-top: 14px;
+    padding: 12px 14px;
     border-radius: 10px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 500;
     display: none;
   }
-
-  .notification.show {
-    display: block;
-    animation: fadeIn 0.25s ease;
-  }
-
-  .notification.success {
-    background: var(--success-bg);
-    color: var(--success-text);
-  }
-
-  .notification.error {
-    background: var(--error-bg);
-    color: var(--error-text);
-  }
+  .notification.show { display: block; animation: fadeIn 0.25s ease; }
+  .notification.success { background: var(--success-bg); color: var(--success-text); }
+  .notification.error { background: var(--error-bg); color: var(--error-text); }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .bookings-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-  }
-
+  .bookings-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
   .bookings-table th {
     text-align: left;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: 0.74rem;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     color: var(--muted);
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--border);
   }
-
   .bookings-table td {
-    padding: 10px 12px;
+    padding: 10px 10px;
     border-bottom: 1px solid var(--border);
+    vertical-align: middle;
   }
-
-  .bookings-table tr:last-child td {
-    border-bottom: none;
-  }
+  .bookings-table tr:last-child td { border-bottom: none; }
 
   .time-badge {
     display: inline-block;
     padding: 3px 10px;
-    background: #eef2ff;
-    color: var(--primary);
+    background: var(--busy-bg);
+    color: var(--busy-text);
     border-radius: 6px;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
   }
 
-  .empty {
-    color: var(--muted);
-    font-size: 0.9rem;
+  .empty { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 12px 0; }
+  .loading { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 12px 0; }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 5px;
+  }
+  .tab {
+    flex: 1;
+    padding: 9px 12px;
     text-align: center;
-    padding: 12px 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--card-2); color: var(--text); }
+
+  .auth-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 14px;
+  }
+  .auth-card { width: 100%; max-width: 400px; }
+  .auth-card h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+    letter-spacing: -0.02em;
+  }
+  .auth-card .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 20px;
   }
 
-  .loading {
+  .auth-switch {
     text-align: center;
+    font-size: 0.85rem;
     color: var(--muted);
-    font-size: 0.9rem;
-    padding: 12px 0;
+    margin-top: 14px;
   }
+  .auth-switch button {
+    background: none;
+    border: none;
+    color: var(--primary-hover);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0 4px;
+  }
+  .auth-switch button:hover { text-decoration: underline; }
+
+  .hidden { display: none !important; }
 
   @media (max-width: 480px) {
-    header h1 { font-size: 1.4rem; }
-    .card { padding: 18px; }
-    .bookings-table th,
-    .bookings-table td { padding: 8px 6px; font-size: 0.875rem; }
+    header h1 { font-size: 1.15rem; }
+    .card { padding: 16px; border-radius: 14px; }
+    .bookings-table th, .bookings-table td { padding: 8px 6px; font-size: 0.85rem; }
+    .btn-danger { padding: 5px 9px; font-size: 0.75rem; }
   }
 </style>
 </head>
 <body>
-<div class="container">
+
+<!-- ================= ЭКРАН АВТОРИЗАЦИИ ================= -->
+<div id="authScreen" class="auth-wrap">
+  <div class="card auth-card">
+    <h1 id="authTitle">Вход</h1>
+    <p class="subtitle" id="authSubtitle">Войдите, чтобы забронировать время</p>
+
+    <form id="authForm">
+      <div class="form-group">
+        <label for="authLogin">Логин</label>
+        <input type="text" id="authLogin" required autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="authPassword">Пароль</label>
+        <input type="password" id="authPassword" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-block" id="authSubmit">Войти</button>
+      <div class="notification" id="authNotification"></div>
+    </form>
+
+    <p class="auth-switch">
+      Нет аккаунта?
+      <button type="button" id="switchToRegister">Зарегистрироваться</button>
+    </p>
+  </div>
+</div>
+
+<!-- ================= ОСНОВНОЕ ПРИЛОЖЕНИЕ ================= -->
+<div id="appScreen" class="container hidden">
   <header>
     <h1>Бронирование времени</h1>
-    <p>Выберите свободный слот и укажите имя сотрудника</p>
+    <div class="user-info">
+      <span id="currentLogin">—</span>
+      <span class="badge user" id="currentRole">user</span>
+      <button class="btn btn-ghost" id="logoutBtn" style="padding:6px 12px;font-size:0.8rem;">Выйти</button>
+    </div>
   </header>
 
-  <div class="card">
-    <h2>Новая бронь</h2>
-    <form id="bookingForm">
-      <div class="form-group">
-        <label for="timeSelect">Время</label>
-        <select id="timeSelect" required>
-          <option value="">Загрузка…</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="employeeInput">Имя сотрудника</label>
-        <input type="text" id="employeeInput" placeholder="Например, Иван Иванов" required autocomplete="name">
-      </div>
-      <button type="submit" id="submitBtn">Забронировать</button>
-      <div class="notification" id="notification"></div>
-    </form>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="booking">Брони</button>
+    <button class="tab hidden" data-tab="users" id="usersTabBtn">Пользователи</button>
   </div>
 
-  <div class="card">
-    <h2>Текущие брони</h2>
-    <div id="bookingsContainer">
-      <div class="loading">Загрузка данных…</div>
+  <!-- Вкладка: Брони -->
+  <section id="tab-booking">
+    <div class="card">
+      <h2>Новая бронь</h2>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label for="timeSelect">Время</label>
+          <select id="timeSelect" required>
+            <option value="">Загрузка…</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="employeeInput">Имя сотрудника</label>
+          <input type="text" id="employeeInput" required>
+        </div>
+        <button type="submit" class="btn btn-block" id="bookBtn">Забронировать</button>
+        <div class="notification" id="bookingNotification"></div>
+      </form>
     </div>
-  </div>
+
+    <div class="card">
+      <h2>Текущие брони</h2>
+      <div id="bookingsContainer">
+        <div class="loading">Загрузка данных…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Вкладка: Пользователи (только админ) -->
+  <section id="tab-users" class="hidden">
+    <div class="card">
+      <h2>Новый пользователь</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="newLogin">Логин</label>
+          <input type="text" id="newLogin" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="newPassword">Пароль</label>
+          <input type="password" id="newPassword" required autocomplete="new-password">
+        </div>
+        <div class="form-group">
+          <label for="newRole">Роль</label>
+          <select id="newRole">
+            <option value="user">Пользователь</option>
+            <option value="admin">Администратор</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-block" id="registerBtn">Создать пользователя</button>
+        <div class="notification" id="registerNotification"></div>
+      </form>
+    </div>
+  </section>
 </div>
 
 <script>
 (function () {
   "use strict";
 
+  /* ============================================================
+   *  КОНФИГУРАЦИЯ
+   * ============================================================ */
   const API_URL = "https://script.google.com/macros/s/AKfycbxeKfh8EiHN1fdvVTncJZS3FD2NszI3SmV8cD70k9zd-4F99qEWuyps1upHP0FCiw/exec";
 
-  const form = document.getElementById("bookingForm");
-  const timeSelect = document.getElementById("timeSelect");
-  const employeeInput = document.getElementById("employeeInput");
-  const submitBtn = document.getElementById("submitBtn");
-  const notification = document.getElementById("notification");
-  const bookingsContainer = document.getElementById("bookingsContainer");
+  const HOURS_START = 9;
+  const HOURS_END = 18;
 
-  // Генерируем список времени от 10:00 до 22:00
-  const ALL_TIMES = [];
-  for (let h = 10; h <= 22; h++) {
-    ALL_TIMES.push(String(h).padStart(2, "0") + ":00");
+  /* ============================================================
+   *  СОСТОЯНИЕ
+   * ============================================================ */
+  const state = {
+    user: null,          // { login, role, hash }
+    bookings: [],        // [{ rowIndex, time, employee }]
+    authMode: "login"    // 'login' | 'register'
+  };
+
+  /* ============================================================
+   *  DOM
+   * ============================================================ */
+  const $ = (id) => document.getElementById(id);
+
+  const authScreen = $("authScreen");
+  const appScreen  = $("appScreen");
+  const authForm   = $("authForm");
+  const authTitle  = $("authTitle");
+  const authSubtitle = $("authSubtitle");
+  const authLogin  = $("authLogin");
+  const authPassword = $("authPassword");
+  const authSubmit = $("authSubmit");
+  const authNotification = $("authNotification");
+  const switchToRegister = $("switchToRegister");
+
+  const currentLogin = $("currentLogin");
+  const currentRole  = $("currentRole");
+  const logoutBtn    = $("logoutBtn");
+  const tabs         = $("tabs");
+  const usersTabBtn  = $("usersTabBtn");
+
+  const bookingForm  = $("bookingForm");
+  const timeSelect   = $("timeSelect");
+  const employeeInput = $("employeeInput");
+  const bookBtn      = $("bookBtn");
+  const bookingNotification = $("bookingNotification");
+  const bookingsContainer = $("bookingsContainer");
+
+  const registerForm = $("registerForm");
+  const newLogin     = $("newLogin");
+  const newPassword  = $("newPassword");
+  const newRole      = $("newRole");
+  const registerBtn  = $("registerBtn");
+  const registerNotification = $("registerNotification");
+
+  /* ============================================================
+   *  КРИПТОГРАФИЯ
+   * ============================================================ */
+  async function sha256Hex(text) {
+    const enc = new TextEncoder();
+    const buf = await crypto.subtle.digest("SHA-256", enc.encode(text));
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
-  let bookings = {}; // { "10:00": "Имя", ... }
+  /* ============================================================
+   *  УВЕДОМЛЕНИЯ
+   * ============================================================ */
+  function notify(el, message, type) {
+    el.textContent = message;
+    el.className = "notification show " + type;
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => el.classList.remove("show"), 4500);
+  }
 
-  function showNotification(message, type) {
-    notification.textContent = message;
-    notification.className = "notification show " + type;
-    setTimeout(() => {
-      notification.classList.remove("show");
-    }, 4000);
+  /* ============================================================
+   *  СЕТЬ
+   * ============================================================ */
+  async function apiGet(params) {
+    const url = API_URL + "?" + new URLSearchParams(params).toString();
+    const res = await fetch(url, { method: "GET" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+
+  async function apiPost(payload) {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+
+  /* ============================================================
+   *  АВТОРИЗАЦИЯ
+   * ============================================================ */
+  function saveSession(user) {
+    state.user = user;
+    localStorage.setItem("booking_session", JSON.stringify(user));
+  }
+
+  function clearSession() {
+    state.user = null;
+    localStorage.removeItem("booking_session");
+  }
+
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem("booking_session");
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (data && data.login && data.role && data.hash) return data;
+    } catch (e) {}
+    return null;
+  }
+
+  function showAuth() {
+    authScreen.classList.remove("hidden");
+    appScreen.classList.add("hidden");
+  }
+
+  function showApp() {
+    authScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+
+    currentLogin.textContent = state.user.login;
+    currentRole.textContent = state.user.role;
+    currentRole.className = "badge " + state.user.role;
+
+    if (state.user.role === "admin") {
+      usersTabBtn.classList.remove("hidden");
+    } else {
+      usersTabBtn.classList.add("hidden");
+      switchTab("booking");
+    }
+
+    // Поле имени блокируем для обычных пользователей
+    if (state.user.role === "user") {
+      employeeInput.value = state.user.login;
+      employeeInput.disabled = true;
+    } else {
+      employeeInput.disabled = false;
+      employeeInput.value = "";
+      employeeInput.placeholder = "Имя сотрудника";
+    }
+
+    loadBookings();
+  }
+
+  async function handleAuthSubmit(e) {
+    e.preventDefault();
+    const login = authLogin.value.trim();
+    const password = authPassword.value;
+    if (!login || !password) return;
+
+    authSubmit.disabled = true;
+    const originalText = authSubmit.textContent;
+    authSubmit.textContent = "Проверка…";
+
+    try {
+      const hash = await sha256Hex(password);
+
+      if (state.authMode === "register") {
+        // Самостоятельная регистрация не предусмотрена — только через админа.
+        // Поэтому переключаем на вход и сообщаем.
+        notify(authNotification, "Регистрация доступна только через администратора", "error");
+        return;
+      }
+
+      const data = await apiPost({ action: "login", login: login, hash: hash });
+
+      if (!data.success) {
+        notify(authNotification, data.message || "Ошибка входа", "error");
+        return;
+      }
+
+      saveSession({ login: data.login, role: data.role, hash: hash });
+      authForm.reset();
+      showApp();
+    } catch (err) {
+      console.error(err);
+      notify(authNotification, "Ошибка сети. Попробуйте позже.", "error");
+    } finally {
+      authSubmit.disabled = false;
+      authSubmit.textContent = originalText;
+    }
+  }
+
+  function setAuthMode(mode) {
+    state.authMode = mode;
+    if (mode === "login") {
+      authTitle.textContent = "Вход";
+      authSubtitle.textContent = "Войдите, чтобы забронировать время";
+      authSubmit.textContent = "Войти";
+      switchToRegister.parentElement.innerHTML =
+        'Нет аккаунта? <button type="button" id="switchToRegister">Обратитесь к администратору</button>';
+      document.getElementById("switchToRegister").addEventListener("click", () => {
+        notify(authNotification, "Регистрация доступна только через администратора", "error");
+      });
+    }
+  }
+
+  /* ============================================================
+   *  БРОНИ
+   * ============================================================ */
+  function allHours() {
+    const arr = [];
+    for (let h = HOURS_START; h <= HOURS_END; h++) {
+      arr.push(String(h).padStart(2, "0") + ":00");
+    }
+    return arr;
   }
 
   function renderTimeOptions() {
+    const busy = {};
+    state.bookings.forEach((b) => { busy[b.time] = b.employee; });
+
     timeSelect.innerHTML = "";
     const placeholder = document.createElement("option");
     placeholder.value = "";
@@ -312,12 +631,12 @@
     placeholder.textContent = "Выберите время";
     timeSelect.appendChild(placeholder);
 
-    ALL_TIMES.forEach((time) => {
+    allHours().forEach((time) => {
       const opt = document.createElement("option");
       opt.value = time;
-      if (bookings[time]) {
+      if (busy[time]) {
         opt.disabled = true;
-        opt.textContent = time + " — Занято (" + bookings[time] + ")";
+        opt.textContent = time + " — Занято (" + busy[time] + ")";
       } else {
         opt.textContent = time;
       }
@@ -326,42 +645,61 @@
   }
 
   function renderBookingsTable() {
-    const entries = Object.keys(bookings).sort();
-    if (entries.length === 0) {
+    if (!state.bookings.length) {
       bookingsContainer.innerHTML = '<div class="empty">Пока нет броней</div>';
       return;
     }
+
+    const isAdmin = state.user && state.user.role === "admin";
 
     const table = document.createElement("table");
     table.className = "bookings-table";
 
     const thead = document.createElement("thead");
-    thead.innerHTML = "<tr><th>Время</th><th>Сотрудник</th></tr>";
+    thead.innerHTML = isAdmin
+      ? "<tr><th>Время</th><th>Сотрудник</th><th></th></tr>"
+      : "<tr><th>Время</th><th>Сотрудник</th></tr>";
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
-    entries.forEach((time) => {
-      const tr = document.createElement("tr");
-      const tdTime = document.createElement("td");
-      const badge = document.createElement("span");
-      badge.className = "time-badge";
-      badge.textContent = time;
-      tdTime.appendChild(badge);
+    state.bookings
+      .slice()
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .forEach((b) => {
+        const tr = document.createElement("tr");
 
-      const tdName = document.createElement("td");
-      tdName.textContent = bookings[time];
+        const tdTime = document.createElement("td");
+        const badge = document.createElement("span");
+        badge.className = "time-badge";
+        badge.textContent = b.time;
+        tdTime.appendChild(badge);
 
-      tr.appendChild(tdTime);
-      tr.appendChild(tdName);
-      tbody.appendChild(tr);
-    });
+        const tdName = document.createElement("td");
+        tdName.textContent = b.employee;
+
+        tr.appendChild(tdTime);
+        tr.appendChild(tdName);
+
+        if (isAdmin) {
+          const tdActions = document.createElement("td");
+          tdActions.style.textAlign = "right";
+          const btn = document.createElement("button");
+          btn.className = "btn btn-danger";
+          btn.textContent = "Удалить";
+          btn.addEventListener("click", () => deleteReservation(b.rowIndex));
+          tdActions.appendChild(btn);
+          tr.appendChild(tdActions);
+        }
+
+        tbody.appendChild(tr);
+      });
     table.appendChild(tbody);
 
     bookingsContainer.innerHTML = "";
     bookingsContainer.appendChild(table);
   }
 
-  function renderAll() {
+  function renderBookings() {
     renderTimeOptions();
     renderBookingsTable();
   }
@@ -369,92 +707,192 @@
   async function loadBookings() {
     bookingsContainer.innerHTML = '<div class="loading">Загрузка данных…</div>';
     timeSelect.innerHTML = '<option value="">Загрузка…</option>';
-
     try {
-      const res = await fetch(API_URL, { method: "GET" });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-
-      // Ожидаем либо объект вида { "10:00": "Имя" }, либо массив [{time, employee}]
-      bookings = {};
-      if (Array.isArray(data)) {
-        data.forEach((item) => {
-          if (item && item.time) bookings[item.time] = item.employee || "";
-        });
-      } else if (data && typeof data === "object") {
-        // Поддерживаем варианты: {bookings: {...}} или плоский объект
-        const src = data.bookings && typeof data.bookings === "object" ? data.bookings : data;
-        Object.keys(src).forEach((key) => {
-          const val = src[key];
-          if (typeof val === "string") {
-            bookings[key] = val;
-          } else if (val && typeof val === "object" && val.employee) {
-            bookings[key] = val.employee;
-          }
-        });
-      }
-      renderAll();
+      const data = await apiPost({ action: "getReservations" });
+      if (!data.success) throw new Error(data.message || "Ошибка загрузки");
+      state.bookings = data.reservations || [];
+      renderBookings();
     } catch (err) {
       console.error(err);
       bookingsContainer.innerHTML = '<div class="empty">Не удалось загрузить данные</div>';
-      renderTimeOptions();
-      showNotification("Не удалось загрузить список броней", "error");
+      notify(bookingNotification, "Не удалось загрузить список броней", "error");
     }
   }
 
-  async function submitBooking(time, employee) {
-    // Google Apps Script корректно принимает POST с text/plain (без preflight)
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ time: time, employee: employee })
-    });
-
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
-    return data;
-  }
-
-  form.addEventListener("submit", async (e) => {
+  async function addReservation(e) {
     e.preventDefault();
+    if (!state.user) return;
 
     const time = timeSelect.value;
     const employee = employeeInput.value.trim();
 
     if (!time) {
-      showNotification("Пожалуйста, выберите время", "error");
+      notify(bookingNotification, "Выберите время", "error");
       return;
     }
     if (!employee) {
-      showNotification("Пожалуйста, укажите имя сотрудника", "error");
+      notify(bookingNotification, "Укажите имя сотрудника", "error");
       return;
     }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Отправка…";
-
+    bookBtn.disabled = true;
+    bookBtn.textContent = "Отправка…";
     try {
-      const data = await submitBooking(time, employee);
+      const data = await apiPost({
+        action: "addReservation",
+        login: state.user.login,
+        hash: state.user.hash,
+        time: time,
+        employee: employee
+      });
 
-      if (data && data.success === false) {
-        showNotification(data.message || "Это время уже занято", "error");
+      if (!data.success) {
+        notify(bookingNotification, data.message || "Не удалось забронировать", "error");
       } else {
-        showNotification(data && data.message ? data.message : "Бронь успешно создана!", "success");
-        employeeInput.value = "";
+        notify(bookingNotification, data.message || "Бронь создана", "success");
+        if (state.user.role === "admin") employeeInput.value = "";
       }
-
       await loadBookings();
     } catch (err) {
       console.error(err);
-      showNotification("Ошибка при отправке. Попробуйте позже.", "error");
+      notify(bookingNotification, "Ошибка сети. Попробуйте позже.", "error");
     } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Забронировать";
+      bookBtn.disabled = false;
+      bookBtn.textContent = "Забронировать";
     }
-  });
+  }
 
-  // Инициализация
-  loadBookings();
+  async function deleteReservation(rowIndex) {
+    if (!state.user || state.user.role !== "admin") return;
+    if (!confirm("Удалить эту бронь?")) return;
+
+    try {
+      const data = await apiPost({
+        action: "deleteReservation",
+        login: state.user.login,
+        hash: state.user.hash,
+        rowIndex: rowIndex
+      });
+
+      if (!data.success) {
+        notify(bookingNotification, data.message || "Не удалось удалить", "error");
+      } else {
+        notify(bookingNotification, data.message || "Бронь удалена", "success");
+      }
+      await loadBookings();
+    } catch (err) {
+      console.error(err);
+      notify(bookingNotification, "Ошибка сети", "error");
+    }
+  }
+
+  /* ============================================================
+   *  АДМИН: регистрация пользователей
+   * ============================================================ */
+  async function handleRegisterUser(e) {
+    e.preventDefault();
+    if (!state.user || state.user.role !== "admin") return;
+
+    const login = newLogin.value.trim();
+    const password = newPassword.value;
+    const role = newRole.value;
+
+    if (!login || !password) {
+      notify(registerNotification, "Заполните все поля", "error");
+      return;
+    }
+    if (password.length < 4) {
+      notify(registerNotification, "Пароль слишком короткий (мин. 4 символа)", "error");
+      return;
+    }
+
+    registerBtn.disabled = true;
+    registerBtn.textContent = "Создание…";
+    try {
+      const hash = await sha256Hex(password);
+      const data = await apiPost({
+        action: "registerUser",
+        login: state.user.login,
+        hash: state.user.hash,
+        newLogin: login,
+        newHash: hash,
+        newRole: role
+      });
+
+      // ВАЖНО: в скрипте мы ожидаем поля login/hash текущего админа
+      // и newLogin/newHash/newRole для нового пользователя.
+      // Ниже — корректный payload с учётом скрипта.
+      // (см. пояснение после кода)
+
+      if (!data.success) {
+        notify(registerNotification, data.message || "Ошибка регистрации", "error");
+      } else {
+        notify(registerNotification, data.message || "Пользователь создан", "success");
+        registerForm.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      notify(registerNotification, "Ошибка сети", "error");
+    } finally {
+      registerBtn.disabled = false;
+      registerBtn.textContent = "Создать пользователя";
+    }
+  }
+
+  /* ============================================================
+   *  ВКЛАДКИ
+   * ============================================================ */
+  function switchTab(name) {
+    document.querySelectorAll(".tab").forEach((t) => {
+      t.classList.toggle("active", t.dataset.tab === name);
+    });
+    $("tab-booking").classList.toggle("hidden", name !== "booking");
+    $("tab-users").classList.toggle("hidden", name !== "users");
+  }
+
+  /* ============================================================
+   *  ИНИЦИАЛИЗАЦИЯ
+   * ============================================================ */
+  function init() {
+    // Авторизация
+    authForm.addEventListener("submit", handleAuthSubmit);
+    if (switchToRegister) {
+      switchToRegister.addEventListener("click", () => {
+        notify(authNotification, "Регистрация доступна только через администратора", "error");
+      });
+    }
+
+    // Выход
+    logoutBtn.addEventListener("click", () => {
+      clearSession();
+      showAuth();
+      setAuthMode("login");
+      authForm.reset();
+    });
+
+    // Брони
+    bookingForm.addEventListener("submit", addReservation);
+
+    // Регистрация пользователя
+    registerForm.addEventListener("submit", handleRegisterUser);
+
+    // Вкладки
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+    });
+
+    // Восстановление сессии
+    const session = loadSession();
+    if (session) {
+      state.user = session;
+      showApp();
+    } else {
+      setAuthMode("login");
+      showAuth();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
 })();
 </script>
 </body>
