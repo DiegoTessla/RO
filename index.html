@@ -3,22 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Бронирование времени</title>
+<title>Планшет СМП</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg: #0f1115;
-    --bg-soft: #161a22;
-    --card: #1c2230;
-    --card-2: #232a3a;
-    --text: #e6e9ef;
-    --muted: #8a93a6;
-    --border: #2a3243;
-    --primary: #6366f1;
-    --primary-hover: #7c7ff5;
-    --danger: #ef4444;
-    --danger-hover: #f56565;
+    --bg: #0b0f14;
+    --bg-2: #111823;
+    --panel: #16202e;
+    --panel-2: #1c2839;
+    --panel-3: #223147;
+    --text: #e8eef7;
+    --muted: #8496ab;
+    --border: #26344a;
+    --accent: #2f9e44;
+    --accent-2: #37b24d;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --red-hover: #f56565;
+    --amber: #f59e0b;
+    --purple: #8b5cf6;
     --success-bg: #14532d;
     --success-text: #bbf7d0;
     --error-bg: #4c1d1d;
@@ -31,155 +35,253 @@
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: radial-gradient(circle at top, #1a2030 0%, var(--bg) 55%);
+    background: radial-gradient(circle at top, #16202e 0%, var(--bg) 60%);
     color: var(--text);
     line-height: 1.5;
     min-height: 100vh;
-    padding: 20px 14px;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  .container { max-width: 860px; margin: 0 auto; }
+  .tablet {
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 100%);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
 
-  header {
+  /* ---------- Статус-бар ---------- */
+  .status-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+    padding: 8px 16px;
+    background: #0a0e14;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.78rem;
+    color: var(--muted);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .status-left, .status-right { display: flex; align-items: center; gap: 10px; }
+  .status-bar .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  .status-bar .dot.offline {
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    animation: none;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .status-bar .clock {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.04em;
+  }
+  .status-bar .battery {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--muted);
   }
 
-  header h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .user-info {
+  /* ---------- Шапка планшета ---------- */
+  .tablet-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.85rem;
-    color: var(--muted);
+    gap: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .tablet-logo {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25), 0 4px 12px rgba(0, 0, 0, 0.4);
+    position: relative;
+  }
+  .tablet-logo::before, .tablet-logo::after {
+    content: ""; position: absolute;
+    background: #fff; border-radius: 2px;
+  }
+  .tablet-logo::before { width: 22px; height: 6px; }
+  .tablet-logo::after  { width: 6px; height: 22px; }
+
+  .tablet-title { flex: 1; min-width: 0; }
+  .tablet-title h1 {
+    font-size: 1.05rem; font-weight: 700;
+    letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .tablet-title .sub {
+    font-size: 0.72rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em;
   }
 
-  .badge {
-    display: inline-block;
-    padding: 3px 9px;
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px 6px 6px;
+    background: var(--panel-3);
+    border: 1px solid var(--border);
     border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 600;
+    font-size: 0.8rem; color: var(--text);
+  }
+  .user-chip .avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #1d4ed8);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.78rem; color: #fff;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
-  .badge.admin { background: #4c1d95; color: #ddd6fe; }
-  .badge.user  { background: #1e3a8a; color: #bfdbfe; }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 11px 16px;
-    font-size: 0.92rem;
-    font-weight: 600;
-    font-family: inherit;
-    color: #fff;
-    background: var(--primary);
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.05s, opacity 0.15s;
-    text-decoration: none;
-    white-space: nowrap;
+  .user-chip .role {
+    font-size: 0.62rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 2px 7px; border-radius: 999px;
   }
-  .btn:hover:not(:disabled) { background: var(--primary-hover); }
-  .btn:active:not(:disabled) { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .user-chip .role.admin { background: #4c1d95; color: #ddd6fe; }
+  .user-chip .role.user  { background: #1e3a8a; color: #bfdbfe; }
+  .user-chip .role.super {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: #1a1207;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.45);
+  }
 
-  .btn-ghost {
-    background: transparent;
+  /* ---------- Рабочая область ---------- */
+  .tablet-body {
+    flex: 1; padding: 20px;
+    overflow-y: auto;
+  }
+
+  /* =============================================
+   *  ЭКРАН АВТОРИЗАЦИИ
+   * ============================================= */
+  .auth-screen {
+    min-height: calc(100vh - 60px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .auth-card {
+    width: 100%; max-width: 420px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
     border: 1px solid var(--border);
-    color: var(--text);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    position: relative; overflow: hidden;
   }
-  .btn-ghost:hover:not(:disabled) { background: var(--card-2); }
-
-  .btn-danger {
-    background: var(--danger);
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    border-radius: 8px;
+  .auth-card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #dc2626, #2f9e44, #3b82f6);
   }
-  .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
-
-  .btn-block { width: 100%; }
-
-  .card {
-    background: linear-gradient(180deg, var(--card) 0%, var(--bg-soft) 100%);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 22px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  .auth-emblem {
+    width: 64px; height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2), 0 8px 24px rgba(220, 38, 38, 0.35);
   }
-  .card + .card { margin-top: 18px; }
+  .auth-emblem::before, .auth-emblem::after {
+    content: ""; position: absolute;
+    background: #fff; border-radius: 3px;
+  }
+  .auth-emblem::before { width: 34px; height: 9px; }
+  .auth-emblem::after  { width: 9px; height: 34px; }
 
-  .card h2 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 14px;
+  .auth-card h1 {
+    text-align: center; font-size: 1.3rem;
+    font-weight: 700; margin-bottom: 4px;
+  }
+  .auth-card .subtitle {
+    text-align: center; color: var(--muted);
+    font-size: 0.84rem; margin-bottom: 22px;
   }
 
+  /* =============================================
+   *  ФОРМЫ
+   * ============================================= */
   .form-group { margin-bottom: 14px; }
-
   label {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 500;
-    margin-bottom: 6px;
+    display: block; font-size: 0.78rem;
+    font-weight: 600; margin-bottom: 6px;
     color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
   }
-
   select, input[type="text"], input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    font-size: 0.98rem;
-    font-family: inherit;
-    color: var(--text);
-    background: var(--card-2);
+    width: 100%; padding: 12px 14px;
+    font-size: 0.96rem; font-family: inherit;
+    color: var(--text); background: #0d1520;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    outline: none;
+    border-radius: 10px; outline: none;
     transition: border-color 0.15s, box-shadow 0.15s;
-    -webkit-appearance: none;
-    appearance: none;
+    -webkit-appearance: none; appearance: none;
   }
-
   select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a93a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238496ab' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
     background-size: 18px;
     padding-right: 40px;
   }
-
   select:focus, input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22);
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.22);
   }
-
   select:disabled, input:disabled {
-    background: #11141b;
-    color: var(--muted);
+    background: #0a1119; color: var(--muted);
     cursor: not-allowed;
   }
 
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px; padding: 11px 16px;
+    font-size: 0.92rem; font-weight: 600;
+    font-family: inherit; color: #fff;
+    background: var(--accent);
+    border: none; border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s, opacity 0.15s;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn:hover:not(:disabled) { background: var(--accent-2); }
+  .btn:active:not(:disabled) { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .btn-block { width: 100%; }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--panel-3); }
+  .btn-danger {
+    background: var(--red); padding: 6px 12px;
+    font-size: 0.78rem; border-radius: 8px;
+  }
+  .btn-danger:hover:not(:disabled) { background: var(--red-hover); }
+  .btn-small {
+    padding: 5px 10px; font-size: 0.76rem; border-radius: 8px;
+  }
+
   .notification {
-    margin-top: 14px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 0.88rem;
-    font-weight: 500;
+    margin-top: 14px; padding: 11px 14px;
+    border-radius: 10px; font-size: 0.86rem; font-weight: 500;
     display: none;
   }
   .notification.show { display: block; animation: fadeIn 0.25s ease; }
@@ -191,13 +293,141 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .bookings-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  /* =============================================
+   *  ГЛАВНЫЙ ЭКРАН
+   * ============================================= */
+  .home-screen { padding: 6px 4px; }
+  .home-greeting { margin-bottom: 22px; }
+  .home-greeting h2 {
+    font-size: 1.25rem; font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .home-greeting p {
+    color: var(--muted); font-size: 0.86rem; margin-top: 2px;
+  }
+
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  .app-tile {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; padding: 22px 14px;
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.15s, box-shadow 0.15s;
+    text-align: center; user-select: none;
+    position: relative; overflow: hidden;
+  }
+  .app-tile:hover {
+    transform: translateY(-2px);
+    border-color: #3a4d6b;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .app-tile:active { transform: scale(0.98); }
+
+  .app-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+  .app-icon svg { width: 30px; height: 30px; }
+  .app-icon.green { background: linear-gradient(135deg, #2f9e44, #1b6b2e); }
+  .app-icon.blue  { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .app-icon.red   { background: linear-gradient(135deg, #ef4444, #991b1b); }
+  .app-icon.amber { background: linear-gradient(135deg, #f59e0b, #b45309); }
+  .app-icon.purple{ background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .app-icon.gray  { background: linear-gradient(135deg, #64748b, #334155); }
+
+  .app-tile .label {
+    font-size: 0.88rem; font-weight: 600;
+    color: var(--text); line-height: 1.25;
+  }
+  .app-tile .sub {
+    font-size: 0.72rem; color: var(--muted);
+    margin-top: -6px;
+  }
+
+  .app-tile .counter-badge {
+    position: absolute; top: 10px; right: 10px;
+    min-width: 22px; height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--amber); color: #1a1207;
+    font-size: 0.72rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
+  }
+
+  /* =============================================
+   *  ЭКРАН ПРИЛОЖЕНИЯ
+   * ============================================= */
+  .app-screen { animation: fadeIn 0.2s ease; }
+  .app-bar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .app-bar .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.84rem; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s;
+  }
+  .app-bar .back-btn:hover { background: var(--panel-3); }
+  .app-bar .back-btn svg { width: 14px; height: 14px; }
+
+  .app-bar .app-bar-title {
+    display: flex; align-items: center; gap: 10px;
+    flex: 1;
+  }
+  .app-bar .app-bar-title h2 {
+    font-size: 1.05rem; font-weight: 700;
+  }
+  .app-bar .app-bar-title .app-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+  }
+  .app-bar .app-bar-title .app-icon svg { width: 18px; height: 18px; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel) 0%, var(--panel-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+  .card + .card { margin-top: 16px; }
+  .card h3 {
+    font-size: 0.98rem; font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .card-head h3 { margin-bottom: 0; }
+
+  /* =============================================
+   *  ТАБЛИЦА БРОНЕЙ
+   * ============================================= */
+  .bookings-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
   .bookings-table th {
-    text-align: left;
-    font-weight: 600;
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    text-align: left; font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
     color: var(--muted);
     padding: 8px 10px;
     border-bottom: 1px solid var(--border);
@@ -212,192 +442,517 @@
   .time-badge {
     display: inline-block;
     padding: 3px 10px;
-    background: var(--busy-bg);
-    color: var(--busy-text);
+    background: var(--busy-bg); color: var(--busy-text);
     border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.85rem;
+    font-weight: 600; font-size: 0.84rem;
     font-variant-numeric: tabular-nums;
   }
-
-  .empty { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 12px 0; }
-  .loading { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 12px 0; }
-
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 16px;
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 5px;
+  .time-badge.mine {
+    background: #1e3a2a; color: #86efac;
+    box-shadow: 0 0 0 1px rgba(134, 239, 172, 0.3);
   }
-  .tab {
-    flex: 1;
-    padding: 9px 12px;
-    text-align: center;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: background 0.15s, color 0.15s;
-    user-select: none;
-    background: transparent;
-    border: none;
-    font-family: inherit;
-  }
-  .tab:hover { color: var(--text); }
-  .tab.active { background: var(--card-2); color: var(--text); }
 
-  .auth-wrap {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 14px;
-  }
-  .auth-card { width: 100%; max-width: 400px; }
-  .auth-card h1 {
-    font-size: 1.5rem;
+  .role-pill {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 0.72rem;
     font-weight: 700;
-    margin-bottom: 6px;
-    text-align: center;
-    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
-  .auth-card .subtitle {
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.88rem;
-    margin-bottom: 20px;
+  .role-pill.admin { background: #4c1d95; color: #ddd6fe; }
+  .role-pill.user  { background: #1e3a8a; color: #bfdbfe; }
+  .role-pill.super {
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: #1a1207;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
   }
 
-  .auth-switch {
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--muted);
+  .empty, .loading {
+    color: var(--muted); font-size: 0.86rem;
+    text-align: center; padding: 14px 0;
+  }
+
+  /* =============================================
+   *  ПРОФИЛЬ
+   * ============================================= */
+  .profile-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+  }
+  .profile-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), #1d4ed8);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.3rem; color: #fff;
+    text-transform: uppercase;
+  }
+  .profile-header .info h3 {
+    font-size: 1.05rem; font-weight: 700;
+  }
+  .profile-header .info .sub {
+    font-size: 0.82rem; color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* =============================================
+   *  О СИСТЕМЕ
+   * ============================================= */
+  .about-list { display: flex; flex-direction: column; gap: 10px; }
+  .about-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    background: #0d1520;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.88rem;
+  }
+  .about-row .key { color: var(--muted); }
+  .about-row .val { color: var(--text); font-weight: 600; }
+  .about-row .val.ok { color: #86efac; }
+  .about-row .val.bad { color: #fca5a5; }
+
+  .about-note {
     margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.55;
+    padding: 12px 14px;
+    background: #0d1520;
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
   }
-  .auth-switch button {
-    background: none;
-    border: none;
-    color: var(--primary-hover);
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-    padding: 0 4px;
-  }
-  .auth-switch button:hover { text-decoration: underline; }
 
   .hidden { display: none !important; }
 
-  @media (max-width: 480px) {
-    header h1 { font-size: 1.15rem; }
-    .card { padding: 16px; border-radius: 14px; }
-    .bookings-table th, .bookings-table td { padding: 8px 6px; font-size: 0.85rem; }
-    .btn-danger { padding: 5px 9px; font-size: 0.75rem; }
+  /* ---------- Мобильная адаптация ---------- */
+  @media (max-width: 600px) {
+    .tablet-body { padding: 14px; }
+    .app-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .app-tile { padding: 16px 8px; border-radius: 14px; }
+    .app-icon { width: 46px; height: 46px; }
+    .app-icon svg { width: 24px; height: 24px; }
+    .app-tile .label { font-size: 0.8rem; }
+    .tablet-header { padding: 12px 14px; }
+    .tablet-title h1 { font-size: 0.95rem; }
+    .user-chip { padding: 4px 8px 4px 4px; font-size: 0.74rem; }
+    .user-chip .avatar { width: 22px; height: 22px; font-size: 0.7rem; }
+    .bookings-table th, .bookings-table td { padding: 8px 6px; font-size: 0.82rem; }
+    .btn-danger, .btn-small { padding: 4px 8px; font-size: 0.72rem; }
     .btn-ghost { padding: 4px 8px !important; font-size: 0.72rem !important; }
+    .card { padding: 14px; border-radius: 14px; }
+    .about-row { font-size: 0.82rem; padding: 8px 10px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ================= ЭКРАН АВТОРИЗАЦИИ ================= -->
-<div id="authScreen" class="auth-wrap">
-  <div class="card auth-card">
-    <h1 id="authTitle">Вход</h1>
-    <p class="subtitle" id="authSubtitle">Войдите, чтобы забронировать время</p>
+<div class="tablet">
 
-    <form id="authForm">
-      <div class="form-group">
-        <label for="authLogin">Логин</label>
-        <input type="text" id="authLogin" required autocomplete="username">
-      </div>
-      <div class="form-group">
-        <label for="authPassword">Пароль</label>
-        <input type="password" id="authPassword" required autocomplete="current-password">
-      </div>
-      <button type="submit" class="btn btn-block" id="authSubmit">Войти</button>
-      <div class="notification" id="authNotification"></div>
-    </form>
-
-    <p class="auth-switch">
-      Нет аккаунта?
-      <button type="button" id="switchToRegister">Обратитесь к администратору</button>
-    </p>
-  </div>
-</div>
-
-<!-- ================= ОСНОВНОЕ ПРИЛОЖЕНИЕ ================= -->
-<div id="appScreen" class="container hidden">
-  <header>
-    <h1>Бронирование времени</h1>
-    <div class="user-info">
-      <span id="currentLogin">—</span>
-      <span class="badge user" id="currentRole">user</span>
-      <button class="btn btn-ghost" id="logoutBtn" style="padding:6px 12px;font-size:0.8rem;">Выйти</button>
+  <!-- ================= СТАТУС-БАР ================= -->
+  <div class="status-bar">
+    <div class="status-left">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusNetwork">Планшет в сети</span>
     </div>
-  </header>
-
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-tab="booking">Брони</button>
-    <button class="tab hidden" data-tab="users" id="usersTabBtn">Пользователи</button>
+    <div class="status-right">
+      <span id="statusUser">—</span>
+      <span class="battery" id="batteryInfo" title="Заряд батареи">
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+          <rect x="0.5" y="0.5" width="13" height="9" rx="2" stroke="currentColor" stroke-width="1"/>
+          <rect x="14" y="3" width="2" height="4" rx="1" fill="currentColor"/>
+          <rect id="batteryLevel" x="2" y="2" width="10" height="6" rx="1" fill="#2f9e44"/>
+        </svg>
+        <span id="batteryText">—</span>
+      </span>
+      <span class="clock" id="statusClock">--:--:--</span>
+    </div>
   </div>
 
-  <!-- Вкладка: Брони -->
-  <section id="tab-booking">
-    <div class="card">
-      <h2>Новая бронь</h2>
-      <form id="bookingForm">
-        <div class="form-group">
-          <label for="timeSelect">Время</label>
-          <select id="timeSelect" required>
-            <option value="">Загрузка…</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="employeeInput">Имя сотрудника</label>
-          <input type="text" id="employeeInput" required>
-        </div>
-        <button type="submit" class="btn btn-block" id="bookBtn">Забронировать</button>
-        <div class="notification" id="bookingNotification"></div>
-      </form>
+  <!-- ================= ШАПКА ================= -->
+  <div class="tablet-header">
+    <div class="tablet-logo"></div>
+    <div class="tablet-title">
+      <h1 id="tabletTitle">Планшет СМП</h1>
+      <div class="sub" id="tabletSub">Служба скорой медицинской помощи</div>
     </div>
+    <div class="user-chip hidden" id="userChip">
+      <div class="avatar" id="userAvatar">?</div>
+      <span id="userLogin">—</span>
+      <span class="role user" id="userRole">user</span>
+      <button class="btn btn-ghost" id="logoutBtn" style="padding:5px 10px;font-size:0.72rem;">Выйти</button>
+    </div>
+  </div>
 
-    <div class="card">
-      <h2>Текущие брони</h2>
-      <div id="bookingsContainer">
-        <div class="loading">Загрузка данных…</div>
+  <!-- ================= ТЕЛО ПЛАНШЕТА ================= -->
+  <div class="tablet-body">
+
+    <!-- ============ ЭКРАН АВТОРИЗАЦИИ ============ -->
+    <div id="authScreen" class="auth-screen">
+      <div class="auth-card">
+        <div class="auth-emblem"></div>
+        <h1>Вход в планшет</h1>
+        <p class="subtitle">Авторизуйтесь для доступа к системе</p>
+
+        <form id="authForm">
+          <div class="form-group">
+            <label for="authLogin">Логин</label>
+            <input type="text" id="authLogin" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="authPassword">Пароль</label>
+            <input type="password" id="authPassword" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn btn-block" id="authSubmit">Войти</button>
+          <div class="notification" id="authNotification"></div>
+        </form>
       </div>
     </div>
-  </section>
 
-  <!-- Вкладка: Пользователи (только админ) -->
-  <section id="tab-users" class="hidden">
-    <div class="card">
-      <h2>Новый пользователь</h2>
-      <form id="registerForm">
-        <div class="form-group">
-          <label for="newLogin">Логин</label>
-          <input type="text" id="newLogin" required autocomplete="off">
+    <!-- ============ ГЛАВНЫЙ ЭКРАН (ПЛИТКИ) ============ -->
+    <div id="homeScreen" class="home-screen hidden">
+      <div class="home-greeting">
+        <h2 id="homeGreeting">Добро пожаловать</h2>
+        <p>Выберите приложение для продолжения работы</p>
+      </div>
+      <div class="app-grid" id="appGrid">
+
+        <div class="app-tile" data-app="booking">
+          <div class="app-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/>
+              <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+              <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>
+            </svg>
+          </div>
+          <div class="label">Бронирование вещания</div>
         </div>
-        <div class="form-group">
-          <label for="newPassword">Пароль</label>
-          <input type="password" id="newPassword" required autocomplete="new-password">
+
+        <div class="app-tile" data-app="my">
+          <div class="app-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <path d="M9 16l2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="label">Мои брони</div>
+          <div class="sub" id="myBookingsSub">—</div>
+          <div class="counter-badge hidden" id="myCounter">0</div>
         </div>
-        <div class="form-group">
-          <label for="newRole">Роль</label>
-          <select id="newRole">
-            <option value="user">Пользователь</option>
-            <option value="admin">Администратор</option>
-          </select>
+
+        <div class="app-tile" data-app="profile">
+          <div class="app-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="label">Профиль</div>
+          <div class="sub">Смена пароля</div>
         </div>
-        <button type="submit" class="btn btn-block" id="registerBtn">Создать пользователя</button>
-        <div class="notification" id="registerNotification"></div>
-      </form>
+
+        <div class="app-tile hidden" data-app="users" id="tileUsers">
+          <div class="app-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="label">Учётные записи</div>
+          <div class="sub">Управление сотрудниками</div>
+        </div>
+
+        <div class="app-tile" data-app="about">
+          <div class="app-icon gray">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          <div class="label">О системе</div>
+        </div>
+
+      </div>
     </div>
-  </section>
+
+    <!-- ============ ПРИЛОЖЕНИЕ: БРОНИРОВАНИЕ ============ -->
+    <div id="appBooking" class="app-screen hidden">
+      <div class="app-bar">
+        <button class="back-btn" data-back="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Назад
+        </button>
+        <div class="app-bar-title">
+          <div class="app-icon green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/>
+              <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/>
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/>
+              <path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>
+            </svg>
+          </div>
+          <h2>Бронирование вещания</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Новая бронь</h3>
+        <form id="bookingForm">
+          <div class="form-group">
+            <label for="timeSelect">Время</label>
+            <select id="timeSelect" required>
+              <option value="">Загрузка…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="employeeInput">Имя сотрудника</label>
+            <input type="text" id="employeeInput" required>
+          </div>
+          <button type="submit" class="btn btn-block" id="bookBtn">Забронировать</button>
+          <div class="notification" id="bookingNotification"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Текущие брони</h3>
+        <div id="bookingsContainer">
+          <div class="loading">Загрузка данных…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ПРИЛОЖЕНИЕ: МОИ БРОНИ ============ -->
+    <div id="appMy" class="app-screen hidden">
+      <div class="app-bar">
+        <button class="back-btn" data-back="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Назад
+        </button>
+        <div class="app-bar-title">
+          <div class="app-icon amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+              <path d="M9 16l2 2 4-4"/>
+            </svg>
+          </div>
+          <h2>Мои брони</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Ваши забронированные часы</h3>
+        <div id="myBookingsContainer">
+          <div class="loading">Загрузка…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ ПРИЛОЖЕНИЕ: ПРОФИЛЬ ============ -->
+    <div id="appProfile" class="app-screen hidden">
+      <div class="app-bar">
+        <button class="back-btn" data-back="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Назад
+        </button>
+        <div class="app-bar-title">
+          <div class="app-icon purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h2>Профиль</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profileAvatar">?</div>
+          <div class="info">
+            <h3 id="profileLogin">—</h3>
+            <div class="sub" id="profileRole">—</div>
+          </div>
+        </div>
+        <div class="about-list">
+          <div class="about-row">
+            <span class="key">Моих броней</span>
+            <span class="val" id="profileBookings">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Смена пароля</h3>
+        <form id="passwordForm">
+          <div class="form-group">
+            <label for="oldPassword">Текущий пароль</label>
+            <input type="password" id="oldPassword" required autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label for="newPassword1">Новый пароль</label>
+            <input type="password" id="newPassword1" required autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label for="newPassword2">Повторите новый пароль</label>
+            <input type="password" id="newPassword2" required autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-block" id="passwordBtn">Изменить пароль</button>
+          <div class="notification" id="passwordNotification"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ ПРИЛОЖЕНИЕ: УЧЁТНЫЕ ЗАПИСИ (админ) ============ -->
+    <div id="appUsers" class="app-screen hidden">
+      <div class="app-bar">
+        <button class="back-btn" data-back="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Назад
+        </button>
+        <div class="app-bar-title">
+          <div class="app-icon blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <h2>Учётные записи</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Список пользователей</h3>
+          <button class="btn btn-small" id="showAddUserBtn">+ Добавить</button>
+        </div>
+        <div id="usersContainer">
+          <div class="loading">Загрузка…</div>
+        </div>
+      </div>
+
+      <div class="card hidden" id="addUserCard">
+        <div class="card-head">
+          <h3>Новый пользователь</h3>
+          <button class="btn btn-ghost btn-small" id="cancelAddUserBtn">Отмена</button>
+        </div>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="newLogin">Логин</label>
+            <input type="text" id="newLogin" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="newPassword">Пароль</label>
+            <input type="password" id="newPassword" required autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label for="newRole">Роль</label>
+            <select id="newRole">
+              <option value="user">Инструктор СМП</option>
+              <option value="admin">Старший состав СМП</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-block" id="registerBtn">Создать пользователя</button>
+          <div class="notification" id="registerNotification"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ ПРИЛОЖЕНИЕ: О СИСТЕМЕ ============ -->
+    <div id="appAbout" class="app-screen hidden">
+      <div class="app-bar">
+        <button class="back-btn" data-back="1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Назад
+        </button>
+        <div class="app-bar-title">
+          <div class="app-icon gray">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </div>
+          <h2>О системе</h2>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Состояние соединения</h3>
+        <div class="about-list">
+          <div class="about-row">
+            <span class="key">Версия планшета</span>
+            <span class="val">3.1</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Сервер (Apps Script)</span>
+            <span class="val" id="aboutServer">Проверка…</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Последняя синхронизация</span>
+            <span class="val" id="aboutLastSync">—</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Авторизация</span>
+            <span class="val ok" id="aboutAuth">—</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Автообновление</span>
+            <span class="val" id="aboutRefresh">каждые 30 секунд</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Диапазон часов</span>
+            <span class="val" id="aboutHours">10:00 – 22:00</span>
+          </div>
+        </div>
+        <div class="about-note">
+          Планшет СМП — внутренний инструмент дежурной смены. Все брони синхронизируются с Google Таблицей.
+          Не передавайте доступ к планшету третьим лицам и не оставляйте его без присмотра на посту.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Уведомления</h3>
+        <div class="about-list">
+          <div class="about-row">
+            <span class="key">Звук при новых бронях</span>
+            <span class="val" id="aboutSound">—</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Вибрация</span>
+            <span class="val" id="aboutVibro">—</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-block" id="testAlertBtn" style="margin-top:14px;">Проверить звук и вибрацию</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <script>
@@ -411,11 +966,16 @@
 
   const HOURS_START = 10;
   const HOURS_END = 22;
+  const USER_BOOKING_LIMIT = 2;
+  const AUTO_REFRESH_MS = 30000;
 
-  const USER_BOOKING_LIMIT = 2;       // лимит для роли 'user'
-  const AUTO_REFRESH_MS = 30000;      // автообновление раз в 30 секунд
+  const SUPERADMIN_LOGIN = "root";
 
-  // Тексты для кнопки "Копировать" по каждому часу
+  const ROLE_LABEL = {
+    admin: "Старший состав СМП",
+    user:  "Инструктор СМП"
+  };
+
   const HOUR_MESSAGES = {
     "10:00": "Доброе утро. Не забывайте включить бодикамеру. Скриншоты без включенной бодикамеры в отчетность не принимаются.",
     "11:00": "Дежурство в больницах также является важной частью нашей работы, пожалуйста распределитесь по больницам.",
@@ -438,7 +998,13 @@
   const state = {
     user: null,
     bookings: [],
-    authMode: "login"
+    users: [],
+    knownBookingIds: null,
+    lastSync: null,
+    serverOk: null,
+    audioCtx: null,
+    soundEnabled: true,
+    vibroEnabled: ("vibrate" in navigator)
   };
 
   /* ============================================================
@@ -447,21 +1013,35 @@
   const $ = (id) => document.getElementById(id);
 
   const authScreen = $("authScreen");
-  const appScreen  = $("appScreen");
+  const homeScreen = $("homeScreen");
+  const appBooking = $("appBooking");
+  const appMy      = $("appMy");
+  const appProfile = $("appProfile");
+  const appUsers   = $("appUsers");
+  const appAbout   = $("appAbout");
+
   const authForm   = $("authForm");
-  const authTitle  = $("authTitle");
-  const authSubtitle = $("authSubtitle");
   const authLogin  = $("authLogin");
   const authPassword = $("authPassword");
   const authSubmit = $("authSubmit");
   const authNotification = $("authNotification");
-  const switchToRegister = $("switchToRegister");
 
-  const currentLogin = $("currentLogin");
-  const currentRole  = $("currentRole");
-  const logoutBtn    = $("logoutBtn");
-  const tabs         = $("tabs");
-  const usersTabBtn  = $("usersTabBtn");
+  const userChip = $("userChip");
+  const userAvatar = $("userAvatar");
+  const userLogin = $("userLogin");
+  const userRole = $("userRole");
+  const logoutBtn = $("logoutBtn");
+  const statusUser = $("statusUser");
+  const statusClock = $("statusClock");
+  const statusDot = $("statusDot");
+  const statusNetwork = $("statusNetwork");
+  const batteryLevel = $("batteryLevel");
+  const batteryText = $("batteryText");
+
+  const homeGreeting = $("homeGreeting");
+  const tileUsers = $("tileUsers");
+  const myCounter = $("myCounter");
+  const myBookingsSub = $("myBookingsSub");
 
   const bookingForm  = $("bookingForm");
   const timeSelect   = $("timeSelect");
@@ -469,6 +1049,23 @@
   const bookBtn      = $("bookBtn");
   const bookingNotification = $("bookingNotification");
   const bookingsContainer = $("bookingsContainer");
+  const myBookingsContainer = $("myBookingsContainer");
+
+  const profileAvatar = $("profileAvatar");
+  const profileLogin = $("profileLogin");
+  const profileRole = $("profileRole");
+  const profileBookings = $("profileBookings");
+  const passwordForm = $("passwordForm");
+  const oldPassword  = $("oldPassword");
+  const newPassword1 = $("newPassword1");
+  const newPassword2 = $("newPassword2");
+  const passwordBtn  = $("passwordBtn");
+  const passwordNotification = $("passwordNotification");
+
+  const usersContainer = $("usersContainer");
+  const addUserCard = $("addUserCard");
+  const showAddUserBtn = $("showAddUserBtn");
+  const cancelAddUserBtn = $("cancelAddUserBtn");
 
   const registerForm = $("registerForm");
   const newLogin     = $("newLogin");
@@ -476,6 +1073,108 @@
   const newRole      = $("newRole");
   const registerBtn  = $("registerBtn");
   const registerNotification = $("registerNotification");
+
+  const aboutServer = $("aboutServer");
+  const aboutLastSync = $("aboutLastSync");
+  const aboutAuth = $("aboutAuth");
+  const aboutHours = $("aboutHours");
+  const aboutSound = $("aboutSound");
+  const aboutVibro = $("aboutVibro");
+  const testAlertBtn = $("testAlertBtn");
+
+  /* ============================================================
+   *  ХЕЛПЕРЫ
+   * ============================================================ */
+  function isSuperadmin(user) {
+    return user && String(user.login).toLowerCase() === SUPERADMIN_LOGIN.toLowerCase();
+  }
+
+  function roleTitle(user) {
+    if (!user) return "—";
+    if (isSuperadmin(user)) return "СУПЕРАДМИН";
+    return ROLE_LABEL[user.role] || user.role;
+  }
+
+  /* ============================================================
+   *  ЧАСЫ + БАТАРЕЯ
+   * ============================================================ */
+  function tickClock() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    statusClock.textContent =
+      pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  async function updateBattery() {
+    if (!navigator.getBattery) { batteryText.textContent = "—"; return; }
+    try {
+      const b = await navigator.getBattery();
+      const render = () => {
+        const pct = Math.round(b.level * 100);
+        batteryText.textContent = pct + "%";
+        const w = Math.max(1, Math.round(10 * b.level));
+        batteryLevel.setAttribute("width", w);
+        if (b.level > 0.5) batteryLevel.setAttribute("fill", "#2f9e44");
+        else if (b.level > 0.2) batteryLevel.setAttribute("fill", "#f59e0b");
+        else batteryLevel.setAttribute("fill", "#ef4444");
+      };
+      render();
+      b.addEventListener("levelchange", render);
+    } catch (e) { batteryText.textContent = "—"; }
+  }
+  updateBattery();
+
+  /* ============================================================
+   *  ЗВУК И ВИБРАЦИЯ
+   * ============================================================ */
+  function ensureAudioCtx() {
+    if (!state.audioCtx) {
+      try {
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) { state.audioCtx = null; }
+    }
+    if (state.audioCtx && state.audioCtx.state === "suspended") {
+      state.audioCtx.resume();
+    }
+    return state.audioCtx;
+  }
+
+  function playAlertSound() {
+    if (!state.soundEnabled) return;
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const tones = [
+      { f: 880,  t: 0.00, d: 0.10 },
+      { f: 1175, t: 0.12, d: 0.10 },
+      { f: 880,  t: 0.24, d: 0.14 }
+    ];
+    tones.forEach(({ f, t, d }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.value = f;
+      gain.gain.setValueAtTime(0.0001, now + t);
+      gain.gain.exponentialRampToValueAtTime(0.12, now + t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + t + d);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + t);
+      osc.stop(now + t + d + 0.02);
+    });
+  }
+
+  function vibrate() {
+    if (!state.vibroEnabled) return;
+    if (navigator.vibrate) navigator.vibrate([120, 60, 120, 60, 200]);
+  }
+
+  function alertNewBookings() {
+    playAlertSound();
+    vibrate();
+  }
 
   /* ============================================================
    *  КРИПТОГРАФИЯ
@@ -518,12 +1217,10 @@
     state.user = user;
     localStorage.setItem("booking_session", JSON.stringify(user));
   }
-
   function clearSession() {
     state.user = null;
     localStorage.removeItem("booking_session");
   }
-
   function loadSession() {
     try {
       const raw = localStorage.getItem("booking_session");
@@ -534,36 +1231,34 @@
     return null;
   }
 
-  function showAuth() {
-    authScreen.classList.remove("hidden");
-    appScreen.classList.add("hidden");
+  function showScreen(name) {
+    authScreen.classList.toggle("hidden", name !== "auth");
+    homeScreen.classList.toggle("hidden", name !== "home");
+    appBooking.classList.toggle("hidden", name !== "booking");
+    appMy.classList.toggle("hidden", name !== "my");
+    appProfile.classList.toggle("hidden", name !== "profile");
+    appUsers.classList.toggle("hidden", name !== "users");
+    appAbout.classList.toggle("hidden", name !== "about");
+
+    userChip.classList.toggle("hidden", name === "auth");
+
+    if (name === "home") {
+      homeGreeting.textContent = "Здравствуйте, " + (state.user ? state.user.login : "");
+      updateMyBadge();
+    }
+    if (name === "my") renderMyBookings();
+    if (name === "profile") renderProfile();
+    if (name === "users") loadUsers();
+    if (name === "about") renderAbout();
   }
 
-  function showApp() {
-    authScreen.classList.add("hidden");
-    appScreen.classList.remove("hidden");
-
-    currentLogin.textContent = state.user.login;
-    currentRole.textContent = state.user.role;
-    currentRole.className = "badge " + state.user.role;
-
-    if (state.user.role === "admin") {
-      usersTabBtn.classList.remove("hidden");
-    } else {
-      usersTabBtn.classList.add("hidden");
-      switchTab("booking");
-    }
-
-    if (state.user.role === "user") {
-      employeeInput.value = state.user.login;
-      employeeInput.disabled = true;
-    } else {
-      employeeInput.disabled = false;
-      employeeInput.value = "";
-      employeeInput.placeholder = "Имя сотрудника";
-    }
-
-    loadBookings();
+  function updateMyBadge() {
+    const count = myBookingsCount();
+    myCounter.textContent = count;
+    if (count > 0) myCounter.classList.remove("hidden");
+    else myCounter.classList.add("hidden");
+    const limit = state.user && state.user.role === "user" ? USER_BOOKING_LIMIT : "∞";
+    myBookingsSub.textContent = count + " / " + limit;
   }
 
   async function handleAuthSubmit(e) {
@@ -587,13 +1282,41 @@
 
       saveSession({ login: data.login, role: data.role, hash: hash });
       authForm.reset();
-      showApp();
+      applySessionToUI();
+      ensureAudioCtx();
+      showScreen("home");
     } catch (err) {
       console.error(err);
       notify(authNotification, "Ошибка сети. Попробуйте позже.", "error");
     } finally {
       authSubmit.disabled = false;
       authSubmit.textContent = originalText;
+    }
+  }
+
+  function applySessionToUI() {
+    if (!state.user) return;
+
+    userLogin.textContent = state.user.login;
+    if (isSuperadmin(state.user)) {
+      userRole.textContent = "СУПЕРАДМИН";
+      userRole.className = "role super";
+    } else {
+      userRole.textContent = ROLE_LABEL[state.user.role] || state.user.role;
+      userRole.className = "role " + state.user.role;
+    }
+    userAvatar.textContent = state.user.login.charAt(0).toUpperCase();
+    statusUser.textContent = state.user.login + " · " + roleTitle(state.user);
+
+    if (state.user.role === "admin") {
+      tileUsers.classList.remove("hidden");
+      employeeInput.disabled = false;
+      employeeInput.value = "";
+      employeeInput.placeholder = "Имя сотрудника";
+    } else {
+      tileUsers.classList.add("hidden");
+      employeeInput.value = state.user.login;
+      employeeInput.disabled = true;
     }
   }
 
@@ -614,6 +1337,14 @@
     return state.bookings.filter(
       (b) => String(b.employee).trim().toLowerCase() === me
     ).length;
+  }
+
+  function myBookingsList() {
+    if (!state.user) return [];
+    const me = state.user.login.toLowerCase();
+    return state.bookings
+      .filter((b) => String(b.employee).trim().toLowerCase() === me)
+      .sort((a, b) => a.time.localeCompare(b.time));
   }
 
   function renderTimeOptions() {
@@ -643,16 +1374,12 @@
 
   async function copyHourMessage(time) {
     const base = HOUR_MESSAGES[time] || "";
-    if (!base) {
-      notify(bookingNotification, "Для этого времени нет текста", "error");
-      return;
-    }
+    if (!base) { notify(bookingNotification, "Для этого времени нет текста", "error"); return; }
     const text = "/fb " + base;
     try {
       await navigator.clipboard.writeText(text);
       notify(bookingNotification, "Текст для " + time + " скопирован", "success");
     } catch (err) {
-      // Фолбэк для старых браузеров / HTTP
       const ta = document.createElement("textarea");
       ta.value = text;
       ta.style.position = "fixed";
@@ -674,8 +1401,8 @@
       bookingsContainer.innerHTML = '<div class="empty">Пока нет броней</div>';
       return;
     }
-
     const isAdmin = state.user && state.user.role === "admin";
+    const me = state.user ? state.user.login.toLowerCase() : "";
 
     const table = document.createElement("table");
     table.className = "bookings-table";
@@ -685,51 +1412,46 @@
     table.appendChild(thead);
 
     const tbody = document.createElement("tbody");
-    state.bookings
-      .slice()
-      .sort((a, b) => a.time.localeCompare(b.time))
-      .forEach((b) => {
-        const tr = document.createElement("tr");
+    state.bookings.slice().sort((a, b) => a.time.localeCompare(b.time)).forEach((b) => {
+      const tr = document.createElement("tr");
 
-        const tdTime = document.createElement("td");
-        const badge = document.createElement("span");
-        badge.className = "time-badge";
-        badge.textContent = b.time;
-        tdTime.appendChild(badge);
+      const tdTime = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "time-badge" +
+        (String(b.employee).trim().toLowerCase() === me ? " mine" : "");
+      badge.textContent = b.time;
+      tdTime.appendChild(badge);
 
-        const tdName = document.createElement("td");
-        tdName.textContent = b.employee;
+      const tdName = document.createElement("td");
+      tdName.textContent = b.employee;
 
-        const tdActions = document.createElement("td");
-        tdActions.style.textAlign = "right";
-        tdActions.style.whiteSpace = "nowrap";
+      const tdActions = document.createElement("td");
+      tdActions.style.textAlign = "right";
+      tdActions.style.whiteSpace = "nowrap";
 
-        // Кнопка "Копировать" — для всех
-        const copyBtn = document.createElement("button");
-        copyBtn.className = "btn btn-ghost";
-        copyBtn.style.padding = "5px 10px";
-        copyBtn.style.fontSize = "0.78rem";
-        if (isAdmin) copyBtn.style.marginRight = "6px";
-        copyBtn.textContent = "Копировать";
-        copyBtn.addEventListener("click", () => copyHourMessage(b.time));
-        tdActions.appendChild(copyBtn);
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "btn btn-ghost";
+      copyBtn.style.padding = "5px 10px";
+      copyBtn.style.fontSize = "0.78rem";
+      if (isAdmin) copyBtn.style.marginRight = "6px";
+      copyBtn.textContent = "Копировать";
+      copyBtn.addEventListener("click", () => copyHourMessage(b.time));
+      tdActions.appendChild(copyBtn);
 
-        // Кнопка "Удалить" — только админ
-        if (isAdmin) {
-          const delBtn = document.createElement("button");
-          delBtn.className = "btn btn-danger";
-          delBtn.textContent = "Удалить";
-          delBtn.addEventListener("click", () => deleteReservation(b.rowIndex));
-          tdActions.appendChild(delBtn);
-        }
+      if (isAdmin) {
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-danger";
+        delBtn.textContent = "Удалить";
+        delBtn.addEventListener("click", () => deleteReservation(b.rowIndex));
+        tdActions.appendChild(delBtn);
+      }
 
-        tr.appendChild(tdTime);
-        tr.appendChild(tdName);
-        tr.appendChild(tdActions);
-        tbody.appendChild(tr);
-      });
+      tr.appendChild(tdTime);
+      tr.appendChild(tdName);
+      tr.appendChild(tdActions);
+      tbody.appendChild(tr);
+    });
     table.appendChild(tbody);
-
     bookingsContainer.innerHTML = "";
     bookingsContainer.appendChild(table);
   }
@@ -737,8 +1459,8 @@
   function renderBookings() {
     renderTimeOptions();
     renderBookingsTable();
+    updateMyBadge();
 
-    // Лимит брони для обычного пользователя
     if (state.user && state.user.role === "user") {
       const count = myBookingsCount();
       if (count >= USER_BOOKING_LIMIT) {
@@ -754,27 +1476,122 @@
     }
   }
 
-  async function loadBookings() {
-    // Не переводим интерфейс в "Загрузка…", если это фоновое обновление
-    if (!state.bookings.length) {
+  function renderMyBookings() {
+    if (!state.user) {
+      myBookingsContainer.innerHTML = '<div class="empty">Войдите, чтобы увидеть брони</div>';
+      return;
+    }
+    const list = myBookingsList();
+    if (!list.length) {
+      myBookingsContainer.innerHTML = '<div class="empty">У вас пока нет броней</div>';
+      return;
+    }
+    const table = document.createElement("table");
+    table.className = "bookings-table";
+    const thead = document.createElement("thead");
+    thead.innerHTML = "<tr><th>Время</th><th></th></tr>";
+    table.appendChild(thead);
+    const tbody = document.createElement("tbody");
+    list.forEach((b) => {
+      const tr = document.createElement("tr");
+      const tdTime = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = "time-badge mine";
+      badge.textContent = b.time;
+      tdTime.appendChild(badge);
+
+      const tdActions = document.createElement("td");
+      tdActions.style.textAlign = "right";
+      tdActions.style.whiteSpace = "nowrap";
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "btn btn-ghost";
+      copyBtn.style.padding = "5px 10px";
+      copyBtn.style.fontSize = "0.78rem";
+      copyBtn.textContent = "Копировать";
+      copyBtn.addEventListener("click", () => copyHourMessage(b.time));
+      tdActions.appendChild(copyBtn);
+
+      if (state.user.role === "admin") {
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-danger";
+        delBtn.style.marginLeft = "6px";
+        delBtn.textContent = "Удалить";
+        delBtn.addEventListener("click", () => deleteReservation(b.rowIndex));
+        tdActions.appendChild(delBtn);
+      }
+      tr.appendChild(tdTime);
+      tr.appendChild(tdActions);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    myBookingsContainer.innerHTML = "";
+    myBookingsContainer.appendChild(table);
+  }
+
+  function renderProfile() {
+    if (!state.user) return;
+    profileLogin.textContent = state.user.login;
+    profileRole.textContent = roleTitle(state.user);
+    profileAvatar.textContent = state.user.login.charAt(0).toUpperCase();
+    profileBookings.textContent = myBookingsCount();
+  }
+
+  function setNetworkStatus(ok) {
+    if (ok) {
+      statusDot.classList.remove("offline");
+      statusNetwork.textContent = "Планшет в сети";
+      state.serverOk = true;
+    } else {
+      statusDot.classList.add("offline");
+      statusNetwork.textContent = "Нет связи с сервером";
+      state.serverOk = false;
+    }
+  }
+
+  function detectNewBookings(newList) {
+    const ids = newList.map((b) => b.time + "|" + b.employee);
+    if (state.knownBookingIds === null) {
+      state.knownBookingIds = new Set(ids);
+      return false;
+    }
+    const known = state.knownBookingIds;
+    let hasNew = false;
+    ids.forEach((id) => { if (!known.has(id)) hasNew = true; });
+    if (hasNew) state.knownBookingIds = new Set(ids);
+    return hasNew;
+  }
+
+  async function loadBookings(silent) {
+    if (!silent && !state.bookings.length) {
       bookingsContainer.innerHTML = '<div class="loading">Загрузка данных…</div>';
       timeSelect.innerHTML = '<option value="">Загрузка…</option>';
     }
-
     try {
       const data = await apiPost({ action: "getReservations" });
-      if (!data || !data.success) {
-        throw new Error((data && data.message) || "Сервер вернул ошибку");
-      }
-      state.bookings = data.reservations || [];
+      if (!data || !data.success) throw new Error((data && data.message) || "Сервер вернул ошибку");
+      const fresh = data.reservations || [];
+      const hadNew = detectNewBookings(fresh);
+      state.bookings = fresh;
+      state.lastSync = new Date();
+      setNetworkStatus(true);
       renderBookings();
+      if (!appMy.classList.contains("hidden")) renderMyBookings();
+      if (!appProfile.classList.contains("hidden")) renderProfile();
+      if (!appAbout.classList.contains("hidden")) renderAbout();
+      if (silent && hadNew && state.user) {
+        alertNewBookings();
+        statusNetwork.textContent = "Новая бронь!";
+        setTimeout(() => setNetworkStatus(true), 3000);
+      }
     } catch (err) {
       console.error("loadBookings error:", err);
-      bookingsContainer.innerHTML =
-        '<div class="empty">Не удалось загрузить данные: ' +
-        String(err.message || err) + '</div>';
-      state.bookings = [];
-      renderBookings();
+      setNetworkStatus(false);
+      if (!silent) {
+        bookingsContainer.innerHTML = '<div class="empty">Не удалось загрузить данные: ' + String(err.message || err) + '</div>';
+        state.bookings = [];
+        renderBookings();
+      }
       notify(bookingNotification, "Не удалось загрузить брони: " + (err.message || err), "error");
     }
   }
@@ -782,24 +1599,14 @@
   async function addReservation(e) {
     e.preventDefault();
     if (!state.user) return;
-
-    // Локальная проверка лимита
     if (state.user.role === "user" && myBookingsCount() >= USER_BOOKING_LIMIT) {
-      notify(bookingNotification, "Достигнут лимит: не более " + USER_BOOKING_LIMIT + " броней на пользователя", "error");
+      notify(bookingNotification, "Достигнут лимит: не более " + USER_BOOKING_LIMIT + " броней", "error");
       return;
     }
-
     const time = timeSelect.value;
     const employee = employeeInput.value.trim();
-
-    if (!time) {
-      notify(bookingNotification, "Выберите время", "error");
-      return;
-    }
-    if (!employee) {
-      notify(bookingNotification, "Укажите имя сотрудника", "error");
-      return;
-    }
+    if (!time) { notify(bookingNotification, "Выберите время", "error"); return; }
+    if (!employee) { notify(bookingNotification, "Укажите имя сотрудника", "error"); return; }
 
     bookBtn.disabled = true;
     bookBtn.textContent = "Отправка…";
@@ -811,14 +1618,12 @@
         time: time,
         employee: employee
       });
-
-      if (!data.success) {
-        notify(bookingNotification, data.message || "Не удалось забронировать", "error");
-      } else {
+      if (!data.success) notify(bookingNotification, data.message || "Не удалось забронировать", "error");
+      else {
         notify(bookingNotification, data.message || "Бронь создана", "success");
         if (state.user.role === "admin") employeeInput.value = "";
       }
-      await loadBookings();
+      await loadBookings(true);
     } catch (err) {
       console.error(err);
       notify(bookingNotification, "Ошибка сети. Попробуйте позже.", "error");
@@ -831,7 +1636,6 @@
   async function deleteReservation(rowIndex) {
     if (!state.user || state.user.role !== "admin") return;
     if (!confirm("Удалить эту бронь?")) return;
-
     try {
       const data = await apiPost({
         action: "deleteReservation",
@@ -839,13 +1643,9 @@
         hash: state.user.hash,
         rowIndex: rowIndex
       });
-
-      if (!data.success) {
-        notify(bookingNotification, data.message || "Не удалось удалить", "error");
-      } else {
-        notify(bookingNotification, data.message || "Бронь удалена", "success");
-      }
-      await loadBookings();
+      if (!data.success) notify(bookingNotification, data.message || "Не удалось удалить", "error");
+      else notify(bookingNotification, data.message || "Бронь удалена", "success");
+      await loadBookings(true);
     } catch (err) {
       console.error(err);
       notify(bookingNotification, "Ошибка сети", "error");
@@ -853,7 +1653,241 @@
   }
 
   /* ============================================================
-   *  АДМИН: регистрация пользователей
+   *  ПРОФИЛЬ: смена пароля
+   * ============================================================ */
+  async function handleChangePassword(e) {
+    e.preventDefault();
+    if (!state.user) return;
+
+    const oldPass = oldPassword.value;
+    const newPass1 = newPassword1.value;
+    const newPass2 = newPassword2.value;
+
+    if (!oldPass || !newPass1 || !newPass2) {
+      notify(passwordNotification, "Заполните все поля", "error");
+      return;
+    }
+    if (newPass1.length < 4) {
+      notify(passwordNotification, "Новый пароль слишком короткий (мин. 4 символа)", "error");
+      return;
+    }
+    if (newPass1 !== newPass2) {
+      notify(passwordNotification, "Новые пароли не совпадают", "error");
+      return;
+    }
+
+    passwordBtn.disabled = true;
+    passwordBtn.textContent = "Отправка…";
+    try {
+      const oldHash = await sha256Hex(oldPass);
+      const newHash = await sha256Hex(newPass1);
+
+      const data = await apiPost({
+        action: "changePassword",
+        login: state.user.login,
+        hash: state.user.hash,
+        oldHash: oldHash,
+        newHash: newHash
+      });
+
+      if (!data.success) {
+        notify(passwordNotification, data.message || "Не удалось сменить пароль", "error");
+      } else {
+        state.user.hash = newHash;
+        saveSession(state.user);
+        notify(passwordNotification, "Пароль успешно изменён", "success");
+        passwordForm.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      notify(passwordNotification, "Ошибка сети", "error");
+    } finally {
+      passwordBtn.disabled = false;
+      passwordBtn.textContent = "Изменить пароль";
+    }
+  }
+
+  /* ============================================================
+   *  АДМИН: список и редактирование пользователей
+   * ============================================================ */
+  async function loadUsers() {
+    usersContainer.innerHTML = '<div class="loading">Загрузка…</div>';
+    try {
+      const data = await apiPost({
+        action: "listUsers",
+        login: state.user.login,
+        hash: state.user.hash
+      });
+      if (!data.success) throw new Error(data.message || "Ошибка загрузки");
+      state.users = data.users || [];
+      renderUsers();
+    } catch (err) {
+      console.error(err);
+      usersContainer.innerHTML = '<div class="empty">Не удалось загрузить список: ' + String(err.message || err) + '</div>';
+    }
+  }
+
+  function renderUsers() {
+    if (!state.users.length) {
+      usersContainer.innerHTML = '<div class="empty">Пока нет пользователей</div>';
+      return;
+    }
+
+    const iAmSuper = isSuperadmin(state.user);
+
+    const table = document.createElement("table");
+    table.className = "bookings-table";
+    const thead = document.createElement("thead");
+    thead.innerHTML = "<tr><th>Логин</th><th>Роль</th><th></th></tr>";
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    state.users.forEach((u) => {
+      const isTargetRoot = String(u.login).toLowerCase() === SUPERADMIN_LOGIN.toLowerCase();
+      const isMe = u.login.toLowerCase() === state.user.login.toLowerCase();
+
+      const tr = document.createElement("tr");
+
+      const tdLogin = document.createElement("td");
+      tdLogin.textContent = u.login;
+      if (isMe) {
+        tdLogin.textContent += " (вы)";
+        tdLogin.style.fontWeight = "600";
+      }
+      if (isTargetRoot) {
+        const star = document.createElement("span");
+        star.textContent = " ★";
+        star.style.color = "#f59e0b";
+        star.title = "Суперадмин";
+        tdLogin.appendChild(star);
+      }
+
+      const tdRole = document.createElement("td");
+      const pill = document.createElement("span");
+      if (isTargetRoot) {
+        pill.className = "role-pill super";
+        pill.textContent = "СУПЕРАДМИН";
+      } else {
+        pill.className = "role-pill " + u.role;
+        pill.textContent = ROLE_LABEL[u.role] || u.role;
+      }
+      tdRole.appendChild(pill);
+
+      const tdActions = document.createElement("td");
+      tdActions.style.textAlign = "right";
+      tdActions.style.whiteSpace = "nowrap";
+
+      // root защищён: кнопки управления не показываем никому, кроме самого root
+      const canManage = !isTargetRoot || iAmSuper;
+
+      if (canManage) {
+        if (!isTargetRoot) {
+          const roleBtn = document.createElement("button");
+          roleBtn.className = "btn btn-ghost btn-small";
+          roleBtn.style.marginRight = "6px";
+          roleBtn.textContent = "Роль";
+          roleBtn.title = "Сменить роль";
+          roleBtn.addEventListener("click", () => toggleUserRole(u));
+          tdActions.appendChild(roleBtn);
+        }
+
+        const passBtn = document.createElement("button");
+        passBtn.className = "btn btn-ghost btn-small";
+        passBtn.style.marginRight = "6px";
+        passBtn.textContent = "Пароль";
+        passBtn.title = "Сбросить пароль";
+        passBtn.addEventListener("click", () => resetUserPassword(u));
+        tdActions.appendChild(passBtn);
+
+        if (!isTargetRoot) {
+          const delBtn = document.createElement("button");
+          delBtn.className = "btn btn-danger btn-small";
+          delBtn.textContent = "Удалить";
+          delBtn.addEventListener("click", () => deleteUser(u));
+          tdActions.appendChild(delBtn);
+        }
+      } else {
+        const locked = document.createElement("span");
+        locked.textContent = "🔒 защищено";
+        locked.style.color = "#8496ab";
+        locked.style.fontSize = "0.78rem";
+        tdActions.appendChild(locked);
+      }
+
+      tr.appendChild(tdLogin);
+      tr.appendChild(tdRole);
+      tr.appendChild(tdActions);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+
+    usersContainer.innerHTML = "";
+    usersContainer.appendChild(table);
+  }
+
+  async function toggleUserRole(user) {
+    const newRole = user.role === "admin" ? "user" : "admin";
+    const label = ROLE_LABEL[newRole];
+    if (!confirm("Изменить роль " + user.login + " на «" + label + "»?")) return;
+    try {
+      const data = await apiPost({
+        action: "updateUser",
+        login: state.user.login,
+        hash: state.user.hash,
+        targetRowIndex: user.rowIndex,
+        newRole: newRole
+      });
+      if (!data.success) alert(data.message || "Не удалось изменить роль");
+      else await loadUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка сети");
+    }
+  }
+
+  async function resetUserPassword(user) {
+    const newPass = prompt("Введите новый пароль для " + user.login + ":");
+    if (!newPass) return;
+    if (newPass.length < 4) {
+      alert("Пароль слишком короткий (мин. 4 символа)");
+      return;
+    }
+    try {
+      const newHash = await sha256Hex(newPass);
+      const data = await apiPost({
+        action: "updateUser",
+        login: state.user.login,
+        hash: state.user.hash,
+        targetRowIndex: user.rowIndex,
+        newPasswordHash: newHash
+      });
+      if (!data.success) alert(data.message || "Не удалось сбросить пароль");
+      else alert("Пароль для " + user.login + " обновлён");
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка сети");
+    }
+  }
+
+  async function deleteUser(user) {
+    if (!confirm("Удалить пользователя «" + user.login + "»? Это действие необратимо.")) return;
+    try {
+      const data = await apiPost({
+        action: "deleteUser",
+        login: state.user.login,
+        hash: state.user.hash,
+        targetRowIndex: user.rowIndex
+      });
+      if (!data.success) alert(data.message || "Не удалось удалить");
+      else await loadUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка сети");
+    }
+  }
+
+  /* ============================================================
+   *  РЕГИСТРАЦИЯ (внутри админ-панели)
    * ============================================================ */
   async function handleRegisterUser(e) {
     e.preventDefault();
@@ -871,6 +1905,10 @@
       notify(registerNotification, "Пароль слишком короткий (мин. 4 символа)", "error");
       return;
     }
+    if (login.toLowerCase() === SUPERADMIN_LOGIN.toLowerCase()) {
+      notify(registerNotification, "Логин 'root' зарезервирован", "error");
+      return;
+    }
 
     registerBtn.disabled = true;
     registerBtn.textContent = "Создание…";
@@ -884,12 +1922,13 @@
         newHash: hash,
         newRole: role
       });
-
       if (!data.success) {
         notify(registerNotification, data.message || "Ошибка регистрации", "error");
       } else {
         notify(registerNotification, data.message || "Пользователь создан", "success");
         registerForm.reset();
+        await loadUsers();
+        setTimeout(() => { addUserCard.classList.add("hidden"); }, 1200);
       }
     } catch (err) {
       console.error(err);
@@ -901,14 +1940,31 @@
   }
 
   /* ============================================================
-   *  ВКЛАДКИ
+   *  О СИСТЕМЕ
    * ============================================================ */
-  function switchTab(name) {
-    document.querySelectorAll(".tab").forEach((t) => {
-      t.classList.toggle("active", t.dataset.tab === name);
-    });
-    $("tab-booking").classList.toggle("hidden", name !== "booking");
-    $("tab-users").classList.toggle("hidden", name !== "users");
+  function renderAbout() {
+    if (state.serverOk === true) {
+      aboutServer.textContent = "Доступен ✓";
+      aboutServer.className = "val ok";
+    } else if (state.serverOk === false) {
+      aboutServer.textContent = "Недоступен ✗";
+      aboutServer.className = "val bad";
+    } else {
+      aboutServer.textContent = "Проверка…";
+      aboutServer.className = "val";
+    }
+    aboutLastSync.textContent = state.lastSync ? state.lastSync.toLocaleTimeString("ru-RU") : "—";
+    aboutAuth.textContent = state.user ? state.user.login + " (" + roleTitle(state.user) + ")" : "не выполнен";
+    aboutAuth.className = state.user ? "val ok" : "val";
+    aboutHours.textContent =
+      String(HOURS_START).padStart(2, "0") + ":00 – " +
+      String(HOURS_END).padStart(2, "0") + ":00";
+    aboutSound.textContent = state.soundEnabled ? "Включён" : "Отключён";
+    aboutSound.className = state.soundEnabled ? "val ok" : "val";
+    aboutVibro.textContent = ("vibrate" in navigator)
+      ? (state.vibroEnabled ? "Поддерживается" : "Отключена")
+      : "Не поддерживается";
+    aboutVibro.className = ("vibrate" in navigator) ? "val ok" : "val";
   }
 
   /* ============================================================
@@ -916,34 +1972,62 @@
    * ============================================================ */
   function init() {
     authForm.addEventListener("submit", handleAuthSubmit);
+    bookingForm.addEventListener("submit", addReservation);
+    passwordForm.addEventListener("submit", handleChangePassword);
+    registerForm.addEventListener("submit", handleRegisterUser);
+
+    document.querySelectorAll("[data-back]").forEach((b) => {
+      b.addEventListener("click", () => showScreen("home"));
+    });
+
+    document.querySelectorAll(".app-tile").forEach((tile) => {
+      tile.addEventListener("click", () => {
+        ensureAudioCtx();
+        const app = tile.dataset.app;
+        if (app === "booking") { showScreen("booking"); loadBookings(true); }
+        else if (app === "my") { showScreen("my"); }
+        else if (app === "profile") { showScreen("profile"); }
+        else if (app === "users") { showScreen("users"); }
+        else if (app === "about") { showScreen("about"); }
+      });
+    });
+
+    showAddUserBtn.addEventListener("click", () => {
+      addUserCard.classList.remove("hidden");
+    });
+    cancelAddUserBtn.addEventListener("click", () => {
+      addUserCard.classList.add("hidden");
+      registerForm.reset();
+    });
+
+    testAlertBtn.addEventListener("click", () => {
+      ensureAudioCtx();
+      playAlertSound();
+      vibrate();
+    });
 
     logoutBtn.addEventListener("click", () => {
       clearSession();
-      showAuth();
+      state.knownBookingIds = null;
+      state.users = [];
+      applySessionToUI();
+      userChip.classList.add("hidden");
+      showScreen("auth");
       authForm.reset();
     });
 
-    bookingForm.addEventListener("submit", addReservation);
-    registerForm.addEventListener("submit", handleRegisterUser);
-
-    document.querySelectorAll(".tab").forEach((tab) => {
-      tab.addEventListener("click", () => switchTab(tab.dataset.tab));
-    });
-
-    // Восстановление сессии
     const session = loadSession();
     if (session) {
       state.user = session;
-      showApp();
+      applySessionToUI();
+      showScreen("home");
+      loadBookings(true);
     } else {
-      showAuth();
+      showScreen("auth");
     }
 
-    // Автообновление списка броней
     setInterval(() => {
-      if (state.user && !document.hidden) {
-        loadBookings();
-      }
+      if (state.user && !document.hidden) loadBookings(true);
     }, AUTO_REFRESH_MS);
   }
 
