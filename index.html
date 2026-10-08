@@ -365,6 +365,36 @@
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.5);
   }
 
+  .app-tile .alert-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(239, 68, 68, 0.6);
+    animation: alertPulse 1.8s infinite;
+  }
+
+  @keyframes alertPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25), 0 2px 8px rgba(239, 68, 68, 0.6);
+    }
+    50% {
+      transform: scale(1.15);
+      box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.15), 0 2px 12px rgba(239, 68, 68, 0.8);
+    }
+  }
+
   /* =============================================
    *  ЭКРАН ПРИЛОЖЕНИЯ
    * ============================================= */
@@ -527,6 +557,152 @@
 
   .hidden { display: none !important; }
 
+  /* =============================================
+   *  ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ
+   * ============================================= */
+  .toast-container {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: calc(100% - 32px);
+    max-width: 460px;
+    pointer-events: none;
+  }
+
+  .toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #1f2a3d 0%, #16202e 100%);
+    border: 1px solid #2f3d55;
+    border-left: 4px solid #2f9e44;
+    border-radius: 14px;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+    color: var(--text);
+    pointer-events: auto;
+    transform: translateY(-120%);
+    opacity: 0;
+    animation: toastIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .toast::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #2f9e44, #37b24d);
+    animation: toastTimer 4.5s linear forwards;
+    width: 100%;
+  }
+
+  .toast.leaving {
+    animation: toastOut 0.3s ease forwards;
+  }
+
+  .toast .toast-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #2f9e44, #1b6b2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(47, 158, 68, 0.35);
+  }
+  .toast .toast-icon svg {
+    width: 22px;
+    height: 22px;
+    color: #fff;
+  }
+
+  .toast .toast-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .toast .toast-title {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+    letter-spacing: 0.01em;
+  }
+  .toast .toast-text {
+    font-size: 0.8rem;
+    color: #c6d0dd;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .toast .toast-time {
+    font-size: 0.7rem;
+    color: #8496ab;
+    margin-top: 3px;
+  }
+
+  .toast .toast-close {
+    background: transparent;
+    border: none;
+    color: #8496ab;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toast .toast-close:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+  }
+
+  .toast.toast-alert {
+    border-left-color: #ef4444;
+  }
+  .toast.toast-alert .toast-icon {
+    background: linear-gradient(135deg, #ef4444, #991b1b);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  }
+  .toast.toast-alert::after {
+    background: linear-gradient(90deg, #ef4444, #f56565);
+  }
+
+  .toast.toast-info {
+    border-left-color: #3b82f6;
+  }
+  .toast.toast-info .toast-icon {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+  }
+  .toast.toast-info::after {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  }
+
+  @keyframes toastIn {
+    0% { transform: translateY(-120%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes toastOut {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-120%); opacity: 0; }
+  }
+  @keyframes toastTimer {
+    0% { width: 100%; }
+    100% { width: 0%; }
+  }
+
   /* ---------- Мобильная адаптация ---------- */
   @media (max-width: 600px) {
     .tablet-body { padding: 14px; }
@@ -544,10 +720,27 @@
     .btn-ghost { padding: 4px 8px !important; font-size: 0.72rem !important; }
     .card { padding: 14px; border-radius: 14px; }
     .about-row { font-size: 0.82rem; padding: 8px 10px; }
+
+    .toast-container {
+      top: 8px;
+      width: calc(100% - 16px);
+      gap: 6px;
+    }
+    .toast {
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    .toast .toast-icon { width: 32px; height: 32px; }
+    .toast .toast-icon svg { width: 18px; height: 18px; }
+    .toast .toast-title { font-size: 0.8rem; }
+    .toast .toast-text { font-size: 0.75rem; }
   }
 </style>
 </head>
 <body>
+
+<!-- ================= КОНТЕЙНЕР УВЕДОМЛЕНИЙ ================= -->
+<div class="toast-container" id="toastContainer"></div>
 
 <div class="tablet">
 
@@ -630,6 +823,7 @@
             </svg>
           </div>
           <div class="label">Бронирование вещания</div>
+          <div class="alert-badge hidden" id="bookingAlertBadge">0</div>
         </div>
 
         <div class="app-tile" data-app="my">
@@ -907,7 +1101,7 @@
         <div class="about-list">
           <div class="about-row">
             <span class="key">Версия планшета</span>
-            <span class="val">3.1</span>
+            <span class="val">3.3</span>
           </div>
           <div class="about-row">
             <span class="key">Сервер (Apps Script)</span>
@@ -924,6 +1118,10 @@
           <div class="about-row">
             <span class="key">Автообновление</span>
             <span class="val" id="aboutRefresh">каждые 30 секунд</span>
+          </div>
+          <div class="about-row">
+            <span class="key">Автосброс броней</span>
+            <span class="val" id="aboutReset">после 22:05</span>
           </div>
           <div class="about-row">
             <span class="key">Диапазон часов</span>
@@ -947,8 +1145,13 @@
             <span class="key">Вибрация</span>
             <span class="val" id="aboutVibro">—</span>
           </div>
+          <div class="about-row">
+            <span class="key">Всплывающие уведомления</span>
+            <span class="val ok" id="aboutToasts">Включены</span>
+          </div>
         </div>
         <button class="btn btn-ghost btn-block" id="testAlertBtn" style="margin-top:14px;">Проверить звук и вибрацию</button>
+        <button class="btn btn-ghost btn-block" id="testToastBtn" style="margin-top:8px;">Показать тестовое уведомление</button>
       </div>
     </div>
 
@@ -970,6 +1173,13 @@
   const AUTO_REFRESH_MS = 30000;
 
   const SUPERADMIN_LOGIN = "root";
+
+  const RESET_HOUR = 22;
+  const RESET_MINUTE = 5;
+
+  const BOOKING_ALERT_KEY = "booking_unread_count";
+  const MAX_TOASTS = 3;
+  const TOAST_LIFETIME = 4500;
 
   const ROLE_LABEL = {
     admin: "Старший состав СМП",
@@ -1012,6 +1222,8 @@
    * ============================================================ */
   const $ = (id) => document.getElementById(id);
 
+  const toastContainer = $("toastContainer");
+
   const authScreen = $("authScreen");
   const homeScreen = $("homeScreen");
   const appBooking = $("appBooking");
@@ -1042,6 +1254,7 @@
   const tileUsers = $("tileUsers");
   const myCounter = $("myCounter");
   const myBookingsSub = $("myBookingsSub");
+  const bookingAlertBadge = $("bookingAlertBadge");
 
   const bookingForm  = $("bookingForm");
   const timeSelect   = $("timeSelect");
@@ -1081,6 +1294,7 @@
   const aboutSound = $("aboutSound");
   const aboutVibro = $("aboutVibro");
   const testAlertBtn = $("testAlertBtn");
+  const testToastBtn = $("testToastBtn");
 
   /* ============================================================
    *  ХЕЛПЕРЫ
@@ -1093,6 +1307,153 @@
     if (!user) return "—";
     if (isSuperadmin(user)) return "СУПЕРАДМИН";
     return ROLE_LABEL[user.role] || user.role;
+  }
+
+  function shouldAutoReset() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    return h > RESET_HOUR || (h === RESET_HOUR && m >= RESET_MINUTE);
+  }
+
+  function todayKey() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+
+  function isResetDue() {
+    if (!shouldAutoReset()) return false;
+    const lastReset = localStorage.getItem("last_reset_date");
+    return lastReset !== todayKey();
+  }
+
+  function markResetDone() {
+    localStorage.setItem("last_reset_date", todayKey());
+  }
+
+  async function tryAutoReset() {
+    if (!isResetDue()) return false;
+    if (!state.user) return false;
+
+    if (state.user.role !== "admin") {
+      markResetDone();
+      return false;
+    }
+
+    try {
+      const res = await apiPost({
+        action: "clearReservations",
+        login: state.user.login,
+        hash: state.user.hash
+      });
+      if (res && res.success) {
+        markResetDone();
+        return true;
+      }
+    } catch (e) {
+      console.error("tryAutoReset error:", e);
+    }
+    return false;
+  }
+
+  /* ============================================================
+   *  ИНДИКАТОР НЕПРОЧИТАННЫХ БРОНЕЙ
+   * ============================================================ */
+  function getUnreadCount() {
+    const v = parseInt(localStorage.getItem(BOOKING_ALERT_KEY) || "0", 10);
+    return isNaN(v) ? 0 : v;
+  }
+
+  function setUnreadCount(n) {
+    if (n <= 0) {
+      localStorage.removeItem(BOOKING_ALERT_KEY);
+      renderUnreadBadge(0);
+    } else {
+      localStorage.setItem(BOOKING_ALERT_KEY, String(n));
+      renderUnreadBadge(n);
+    }
+  }
+
+  function incrementUnread(n) {
+    setUnreadCount(getUnreadCount() + n);
+  }
+
+  function clearUnread() {
+    localStorage.removeItem(BOOKING_ALERT_KEY);
+    renderUnreadBadge(0);
+  }
+
+  function renderUnreadBadge(n) {
+    if (!bookingAlertBadge) return;
+    if (!n || n <= 0) {
+      bookingAlertBadge.classList.add("hidden");
+      bookingAlertBadge.textContent = "0";
+      return;
+    }
+    bookingAlertBadge.classList.remove("hidden");
+    bookingAlertBadge.textContent = n > 99 ? "99+" : String(n);
+  }
+
+  /* ============================================================
+   *  ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ
+   * ============================================================ */
+  function showToast(opts) {
+    if (!toastContainer) return;
+
+    const existing = toastContainer.querySelectorAll(".toast:not(.leaving)");
+    if (existing.length >= MAX_TOASTS) {
+      dismissToast(existing[0]);
+    }
+
+    const type = opts.type || "success";
+    const iconSvg = opts.icon || (
+      type === "alert"
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+        : type === "info"
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+    );
+
+    const el = document.createElement("div");
+    el.className = "toast toast-" + type;
+    el.innerHTML =
+      '<div class="toast-icon">' + iconSvg + '</div>' +
+      '<div class="toast-body">' +
+        '<div class="toast-title">' + (opts.title || "Уведомление") + '</div>' +
+        '<div class="toast-text">' + (opts.text || "") + '</div>' +
+        '<div class="toast-time">' + new Date().toLocaleTimeString("ru-RU") + '</div>' +
+      '</div>' +
+      '<button class="toast-close" type="button" aria-label="Закрыть">×</button>';
+
+    el.querySelector(".toast-close").addEventListener("click", (e) => {
+      e.stopPropagation();
+      dismissToast(el);
+    });
+
+    if (opts.onClick) {
+      el.style.cursor = "pointer";
+      el.addEventListener("click", () => {
+        opts.onClick();
+        dismissToast(el);
+      });
+    }
+
+    toastContainer.appendChild(el);
+
+    const timer = setTimeout(() => dismissToast(el), opts.duration || TOAST_LIFETIME);
+    el._timer = timer;
+
+    return el;
+  }
+
+  function dismissToast(el) {
+    if (!el || el.classList.contains("leaving")) return;
+    clearTimeout(el._timer);
+    el.classList.add("leaving");
+    setTimeout(() => {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 300);
   }
 
   /* ============================================================
@@ -1188,7 +1549,7 @@
   }
 
   /* ============================================================
-   *  УВЕДОМЛЕНИЯ
+   *  УВЕДОМЛЕНИЯ (внутри форм)
    * ============================================================ */
   function notify(el, message, type) {
     el.textContent = message;
@@ -1245,6 +1606,7 @@
     if (name === "home") {
       homeGreeting.textContent = "Здравствуйте, " + (state.user ? state.user.login : "");
       updateMyBadge();
+      renderUnreadBadge(getUnreadCount());
     }
     if (name === "my") renderMyBookings();
     if (name === "profile") renderProfile();
@@ -1284,7 +1646,17 @@
       authForm.reset();
       applySessionToUI();
       ensureAudioCtx();
+
+      await tryAutoReset();
+
       showScreen("home");
+      loadBookings(true);
+
+      showToast({
+        type: "info",
+        title: "Добро пожаловать",
+        text: data.login + " · " + roleTitle({ login: data.login, role: data.role })
+      });
     } catch (err) {
       console.error(err);
       notify(authNotification, "Ошибка сети. Попробуйте позже.", "error");
@@ -1551,15 +1923,22 @@
 
   function detectNewBookings(newList) {
     const ids = newList.map((b) => b.time + "|" + b.employee);
+
     if (state.knownBookingIds === null) {
       state.knownBookingIds = new Set(ids);
-      return false;
+      return 0;
     }
+
     const known = state.knownBookingIds;
-    let hasNew = false;
-    ids.forEach((id) => { if (!known.has(id)) hasNew = true; });
-    if (hasNew) state.knownBookingIds = new Set(ids);
-    return hasNew;
+    let newCount = 0;
+    ids.forEach((id) => {
+      if (!known.has(id)) newCount++;
+    });
+
+    if (newCount > 0) {
+      state.knownBookingIds = new Set(ids);
+    }
+    return newCount;
   }
 
   async function loadBookings(silent) {
@@ -1571,7 +1950,7 @@
       const data = await apiPost({ action: "getReservations" });
       if (!data || !data.success) throw new Error((data && data.message) || "Сервер вернул ошибку");
       const fresh = data.reservations || [];
-      const hadNew = detectNewBookings(fresh);
+      const newCount = detectNewBookings(fresh);
       state.bookings = fresh;
       state.lastSync = new Date();
       setNetworkStatus(true);
@@ -1579,10 +1958,43 @@
       if (!appMy.classList.contains("hidden")) renderMyBookings();
       if (!appProfile.classList.contains("hidden")) renderProfile();
       if (!appAbout.classList.contains("hidden")) renderAbout();
-      if (silent && hadNew && state.user) {
+
+      if (silent && newCount > 0 && state.user) {
         alertNewBookings();
-        statusNetwork.textContent = "Новая бронь!";
+        incrementUnread(newCount);
+        statusNetwork.textContent = (newCount === 1 ? "Новая бронь!" : "Новых броней: " + newCount);
         setTimeout(() => setNetworkStatus(true), 3000);
+
+        // Показываем всплывающее уведомление
+        const sorted = fresh.slice().sort((a, b) => a.time.localeCompare(b.time));
+        const latest = sorted[sorted.length - 1];
+        const isMine = latest && String(latest.employee).trim().toLowerCase() === state.user.login.toLowerCase();
+
+        if (!isMine) {
+          if (newCount === 1 && latest) {
+            showToast({
+              type: "success",
+              title: "Новая бронь вещания",
+              text: latest.time + " — " + latest.employee,
+              onClick: () => {
+                clearUnread();
+                showScreen("booking");
+                loadBookings(true);
+              }
+            });
+          } else {
+            showToast({
+              type: "success",
+              title: "Новые брони: " + newCount,
+              text: "Последняя: " + (latest ? latest.time + " — " + latest.employee : ""),
+              onClick: () => {
+                clearUnread();
+                showScreen("booking");
+                loadBookings(true);
+              }
+            });
+          }
+        }
       }
     } catch (err) {
       console.error("loadBookings error:", err);
@@ -1618,15 +2030,31 @@
         time: time,
         employee: employee
       });
-      if (!data.success) notify(bookingNotification, data.message || "Не удалось забронировать", "error");
-      else {
+      if (!data.success) {
+        notify(bookingNotification, data.message || "Не удалось забронировать", "error");
+        showToast({
+          type: "alert",
+          title: "Не удалось забронировать",
+          text: data.message || "Попробуйте другое время"
+        });
+      } else {
         notify(bookingNotification, data.message || "Бронь создана", "success");
+        showToast({
+          type: "success",
+          title: "Бронь создана",
+          text: time + " — " + employee
+        });
         if (state.user.role === "admin") employeeInput.value = "";
       }
       await loadBookings(true);
     } catch (err) {
       console.error(err);
       notify(bookingNotification, "Ошибка сети. Попробуйте позже.", "error");
+      showToast({
+        type: "alert",
+        title: "Ошибка сети",
+        text: "Не удалось отправить запрос"
+      });
     } finally {
       bookBtn.disabled = false;
       bookBtn.textContent = "Забронировать";
@@ -1692,10 +2120,20 @@
 
       if (!data.success) {
         notify(passwordNotification, data.message || "Не удалось сменить пароль", "error");
+        showToast({
+          type: "alert",
+          title: "Не удалось сменить пароль",
+          text: data.message || "Проверьте текущий пароль"
+        });
       } else {
         state.user.hash = newHash;
         saveSession(state.user);
         notify(passwordNotification, "Пароль успешно изменён", "success");
+        showToast({
+          type: "success",
+          title: "Пароль изменён",
+          text: "Используйте новый пароль при следующем входе"
+        });
         passwordForm.reset();
       }
     } catch (err) {
@@ -1777,7 +2215,6 @@
       tdActions.style.textAlign = "right";
       tdActions.style.whiteSpace = "nowrap";
 
-      // root защищён: кнопки управления не показываем никому, кроме самого root
       const canManage = !isTargetRoot || iAmSuper;
 
       if (canManage) {
@@ -1837,8 +2274,16 @@
         targetRowIndex: user.rowIndex,
         newRole: newRole
       });
-      if (!data.success) alert(data.message || "Не удалось изменить роль");
-      else await loadUsers();
+      if (!data.success) {
+        alert(data.message || "Не удалось изменить роль");
+      } else {
+        showToast({
+          type: "success",
+          title: "Роль изменена",
+          text: user.login + " → " + label
+        });
+        await loadUsers();
+      }
     } catch (err) {
       console.error(err);
       alert("Ошибка сети");
@@ -1861,8 +2306,15 @@
         targetRowIndex: user.rowIndex,
         newPasswordHash: newHash
       });
-      if (!data.success) alert(data.message || "Не удалось сбросить пароль");
-      else alert("Пароль для " + user.login + " обновлён");
+      if (!data.success) {
+        alert(data.message || "Не удалось сбросить пароль");
+      } else {
+        showToast({
+          type: "success",
+          title: "Пароль обновлён",
+          text: user.login
+        });
+      }
     } catch (err) {
       console.error(err);
       alert("Ошибка сети");
@@ -1878,8 +2330,16 @@
         hash: state.user.hash,
         targetRowIndex: user.rowIndex
       });
-      if (!data.success) alert(data.message || "Не удалось удалить");
-      else await loadUsers();
+      if (!data.success) {
+        alert(data.message || "Не удалось удалить");
+      } else {
+        showToast({
+          type: "success",
+          title: "Пользователь удалён",
+          text: user.login
+        });
+        await loadUsers();
+      }
     } catch (err) {
       console.error(err);
       alert("Ошибка сети");
@@ -1924,8 +2384,18 @@
       });
       if (!data.success) {
         notify(registerNotification, data.message || "Ошибка регистрации", "error");
+        showToast({
+          type: "alert",
+          title: "Ошибка регистрации",
+          text: data.message || "Попробуйте снова"
+        });
       } else {
         notify(registerNotification, data.message || "Пользователь создан", "success");
+        showToast({
+          type: "success",
+          title: "Пользователь создан",
+          text: login + " · " + (ROLE_LABEL[role] || role)
+        });
         registerForm.reset();
         await loadUsers();
         setTimeout(() => { addUserCard.classList.add("hidden"); }, 1200);
@@ -1971,6 +2441,9 @@
    *  ИНИЦИАЛИЗАЦИЯ
    * ============================================================ */
   function init() {
+    // Первичная отрисовка бейджа непрочитанных
+    renderUnreadBadge(getUnreadCount());
+
     authForm.addEventListener("submit", handleAuthSubmit);
     bookingForm.addEventListener("submit", addReservation);
     passwordForm.addEventListener("submit", handleChangePassword);
@@ -1984,7 +2457,12 @@
       tile.addEventListener("click", () => {
         ensureAudioCtx();
         const app = tile.dataset.app;
-        if (app === "booking") { showScreen("booking"); loadBookings(true); }
+        if (app === "booking") {
+          // Заход в приложение — сбрасываем счётчик непрочитанных
+          clearUnread();
+          showScreen("booking");
+          loadBookings(true);
+        }
         else if (app === "my") { showScreen("my"); }
         else if (app === "profile") { showScreen("profile"); }
         else if (app === "users") { showScreen("users"); }
@@ -2006,8 +2484,24 @@
       vibrate();
     });
 
+    testToastBtn.addEventListener("click", () => {
+      showToast({
+        type: "success",
+        title: "Тестовое уведомление",
+        text: "Так выглядит всплывающее оповещение на планшете",
+        onClick: () => {
+          showToast({
+            type: "info",
+            title: "Клик по уведомлению",
+            text: "Сюда можно подставить любое действие"
+          });
+        }
+      });
+    });
+
     logoutBtn.addEventListener("click", () => {
       clearSession();
+      clearUnread();
       state.knownBookingIds = null;
       state.users = [];
       applySessionToUI();
@@ -2016,18 +2510,26 @@
       authForm.reset();
     });
 
+    // Восстановление сессии
     const session = loadSession();
     if (session) {
       state.user = session;
       applySessionToUI();
       showScreen("home");
-      loadBookings(true);
+      tryAutoReset().then(() => loadBookings(true));
     } else {
       showScreen("auth");
     }
 
+    // Автообновление + проверка перехода через 22:05
     setInterval(() => {
-      if (state.user && !document.hidden) loadBookings(true);
+      if (state.user && !document.hidden) {
+        if (isResetDue()) {
+          tryAutoReset().then(() => loadBookings(true));
+        } else {
+          loadBookings(true);
+        }
+      }
     }, AUTO_REFRESH_MS);
   }
 
